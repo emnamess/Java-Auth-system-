@@ -2,6 +2,7 @@ package esprit.tn.services;
 
 import esprit.tn.entities.*;
 import esprit.tn.main.DatabaseConnection;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -12,8 +13,9 @@ public class userService implements Iservice<user> {
     Connection cnx;
 
     public userService() {
-        cnx = DatabaseConnection.instance.getCnx();
+        cnx = DatabaseConnection.getInstance().getCnx();
     }
+
 
 
     public void ajouter(user user) {
@@ -21,10 +23,14 @@ public class userService implements Iservice<user> {
 
         try {
             PreparedStatement stmUser = cnx.prepareStatement(reqUser, Statement.RETURN_GENERATED_KEYS);
+
+            // Hash the password before inserting it
+            String hashedPassword = BCrypt.hashpw(user.getMotDePasse(), BCrypt.gensalt());
+
             stmUser.setString(1, user.getNom());
             stmUser.setString(2, user.getPrenom());
             stmUser.setString(3, user.getEmail());
-            stmUser.setString(4, user.getMotDePasse());
+            stmUser.setString(4, hashedPassword);  // ✅ Save hashed password instead of plain text
             stmUser.setDate(5, java.sql.Date.valueOf(user.getDateNaissance()));
             stmUser.setString(6, user.getAdresse());
             stmUser.setInt(7, user.getTelephone());
@@ -32,59 +38,49 @@ public class userService implements Iservice<user> {
 
             stmUser.executeUpdate();
 
-            // If user is a participant, insert into participants table
-            if (user instanceof participant) {
-                ResultSet generatedKeys = stmUser.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int userId = generatedKeys.getInt(1); // Get the generated id_user
+            ResultSet generatedKeys = stmUser.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                int userId = generatedKeys.getInt(1); // Get the generated id_user
+
+                // If user is a participant, insert into participants table
+                if (user instanceof participant) {
                     String reqParticipant = "INSERT INTO participants (id_user, nombreParticipations) VALUES (?, ?)";
                     PreparedStatement stmParticipant = cnx.prepareStatement(reqParticipant);
                     stmParticipant.setInt(1, userId);
                     stmParticipant.setInt(2, ((participant) user).getNombreParticipations());
                     stmParticipant.executeUpdate();
                 }
-            }
-            // If user is a partenaire, insert into partenaire table
-            if (user instanceof partenaire) {
-                ResultSet generatedKeys = stmUser.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int userId = generatedKeys.getInt(1); // Get the generated id_user
-                    String reqParticipant = "INSERT INTO partenaire (id_user, type_service,site_web,nbre_contacts) VALUES (?, ?, ?, ?)";
-                    PreparedStatement stmParticipant = cnx.prepareStatement(reqParticipant);
-                    stmParticipant.setInt(1, userId);
-                    stmParticipant.setString(2,((partenaire) user).getTypeService());
-                    stmParticipant.setString(3,((partenaire)user).getSiteWeb());
-                    stmParticipant.setInt(4, ((partenaire) user).getNbreContrats());
-                    stmParticipant.executeUpdate();
-                }
-            }
-            //If the user is an organisateur , Insert into organisateur table
-            if (user instanceof organisateur) {
-                ResultSet generatedKeys = stmUser.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int userId = generatedKeys.getInt(1); // Get the generated id_user
-                    String reqParticipant = "INSERT INTO organisateur (id_user,workField,workEmail) VALUES (?, ?, ?)";
-                    PreparedStatement stmParticipant = cnx.prepareStatement(reqParticipant);
-                    stmParticipant.setInt(1, userId);
-                    stmParticipant.setString(2,((organisateur) user).getWorkField());
-                    stmParticipant.setString(3,((organisateur)user).getWorkEmail());
-                    stmParticipant.executeUpdate();
-                }
-            }
-            //If the user is an admin , Insert into admin table
-            if (user instanceof admin) {
-                ResultSet generatedKeys = stmUser.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int userId = generatedKeys.getInt(1); // Get the generated id_user
-                    String reqParticipant = "INSERT INTO admin (id_user,createdAt) VALUES (?, ?)";
-                    PreparedStatement stmParticipant = cnx.prepareStatement(reqParticipant);
-                    stmParticipant.setInt(1, userId);
-                    stmParticipant.setDate(2,java.sql.Date.valueOf(((admin) user).getCreatedAt()));
 
-                    stmParticipant.executeUpdate();
+                // If user is a partenaire, insert into partenaire table
+                if (user instanceof partenaire) {
+                    String reqPartenaire = "INSERT INTO partenaire (id_user, type_service, site_web, nbre_contacts) VALUES (?, ?, ?, ?)";
+                    PreparedStatement stmPartenaire = cnx.prepareStatement(reqPartenaire);
+                    stmPartenaire.setInt(1, userId);
+                    stmPartenaire.setString(2, ((partenaire) user).getTypeService());
+                    stmPartenaire.setString(3, ((partenaire) user).getSiteWeb());
+                    stmPartenaire.setInt(4, ((partenaire) user).getNbreContrats());
+                    stmPartenaire.executeUpdate();
+                }
+
+                // If user is an organisateur, insert into organisateur table
+                if (user instanceof organisateur) {
+                    String reqOrganisateur = "INSERT INTO organisateur (id_user, workField, workEmail) VALUES (?, ?, ?)";
+                    PreparedStatement stmOrganisateur = cnx.prepareStatement(reqOrganisateur);
+                    stmOrganisateur.setInt(1, userId);
+                    stmOrganisateur.setString(2, ((organisateur) user).getWorkField());
+                    stmOrganisateur.setString(3, ((organisateur) user).getWorkEmail());
+                    stmOrganisateur.executeUpdate();
+                }
+
+                // If user is an admin, insert into admin table
+                if (user instanceof admin) {
+                    String reqAdmin = "INSERT INTO admin (id_user, createdAt) VALUES (?, ?)";
+                    PreparedStatement stmAdmin = cnx.prepareStatement(reqAdmin);
+                    stmAdmin.setInt(1, userId);
+                    stmAdmin.setDate(2, java.sql.Date.valueOf(((admin) user).getCreatedAt()));
+                    stmAdmin.executeUpdate();
                 }
             }
-
 
             System.out.println("Utilisateur ajouté avec succès !");
         } catch (SQLException e) {
@@ -213,7 +209,7 @@ public class userService implements Iservice<user> {
                 int telephone = rsUser.getInt("telephone");
                 Date dateInscription = rsUser.getDate("date_inscription");
 
-                user u = new user(id, nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate());
+                user u = new user(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate());
 
                 // Check if user is a participant
                 String reqParticipant = "SELECT nombreParticipations FROM participants WHERE id_user = ?";
@@ -222,7 +218,7 @@ public class userService implements Iservice<user> {
                 ResultSet rsParticipant = stmParticipant.executeQuery();
                 if (rsParticipant.next()) {
                     int nombreParticipations = rsParticipant.getInt("nombreParticipations");
-                    u = new participant(id, nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), nombreParticipations);
+                    u = new participant( nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), nombreParticipations);
                 }
 
                 // Check if user is a partenaire
@@ -234,7 +230,7 @@ public class userService implements Iservice<user> {
                     String typeService = rsPartenaire.getString("type_service");
                     String siteWeb = rsPartenaire.getString("site_web");
                     int nbreContrats = rsPartenaire.getInt("nbre_contacts");
-                    u = new partenaire(id, nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), typeService, siteWeb, nbreContrats);
+                    u = new partenaire(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), typeService, siteWeb, nbreContrats);
                 }
 
                 // Check if user is an organisateur
@@ -245,7 +241,7 @@ public class userService implements Iservice<user> {
                 if (rsOrganisateur.next()) {
                     String workField = rsOrganisateur.getString("workField");
                     String workEmail = rsOrganisateur.getString("workEmail");
-                    u = new organisateur(id, nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), workField, workEmail);
+                    u = new organisateur(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), workField, workEmail);
                 }
 
                 // Check if user is an admin
@@ -255,7 +251,7 @@ public class userService implements Iservice<user> {
                 ResultSet rsAdmin = stmAdmin.executeQuery();
                 if (rsAdmin.next()) {
                     LocalDate createdAt = rsAdmin.getDate("createdAt").toLocalDate();
-                    u = new admin(id, nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), createdAt);
+                    u = new admin(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), createdAt);
                 }
 
                 users.add(u);
@@ -281,6 +277,7 @@ public class userService implements Iservice<user> {
             ResultSet rsUser = stmUser.executeQuery();
 
             if (rsUser.next()) {
+                int idUser = rsUser.getInt("id_user");  // ✅ Get the ID
                 String nom = rsUser.getString("nom");
                 String prenom = rsUser.getString("prenom");
                 String email = rsUser.getString("email");
@@ -290,7 +287,9 @@ public class userService implements Iservice<user> {
                 int telephone = rsUser.getInt("telephone");
                 Date dateInscription = rsUser.getDate("date_inscription");
 
-                u = new user(id, nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate());
+                // ✅ Create the user object with the correct ID
+                u = new user(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate());
+                u.setId_user(idUser);  // ✅ Set the ID!
 
                 // Check if user is a participant
                 String reqParticipant = "SELECT nombreParticipations FROM participants WHERE id_user = ?";
@@ -299,7 +298,8 @@ public class userService implements Iservice<user> {
                 ResultSet rsParticipant = stmParticipant.executeQuery();
                 if (rsParticipant.next()) {
                     int nombreParticipations = rsParticipant.getInt("nombreParticipations");
-                    u = new participant(id, nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), nombreParticipations);
+                    u = new participant(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), nombreParticipations);
+                    u.setId_user(idUser);  // ✅ Keep the ID!
                 }
 
                 // Check if user is a partenaire
@@ -311,7 +311,8 @@ public class userService implements Iservice<user> {
                     String typeService = rsPartenaire.getString("type_service");
                     String siteWeb = rsPartenaire.getString("site_web");
                     int nbreContrats = rsPartenaire.getInt("nbre_contacts");
-                    u = new partenaire(id, nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), typeService, siteWeb, nbreContrats);
+                    u = new partenaire(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), typeService, siteWeb, nbreContrats);
+                    u.setId_user(idUser);
                 }
 
                 // Check if user is an organisateur
@@ -322,7 +323,8 @@ public class userService implements Iservice<user> {
                 if (rsOrganisateur.next()) {
                     String workField = rsOrganisateur.getString("workField");
                     String workEmail = rsOrganisateur.getString("workEmail");
-                    u = new organisateur(id, nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), workField, workEmail);
+                    u = new organisateur(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), workField, workEmail);
+                    u.setId_user(idUser);
                 }
 
                 // Check if user is an admin
@@ -332,12 +334,12 @@ public class userService implements Iservice<user> {
                 ResultSet rsAdmin = stmAdmin.executeQuery();
                 if (rsAdmin.next()) {
                     LocalDate createdAt = rsAdmin.getDate("createdAt").toLocalDate();
-                    u = new admin(id, nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), createdAt);
+                    u = new admin(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), createdAt);
+                    u.setId_user(idUser);
                 }
 
-            System.out.println("User " + nom );} 
-
-            else {
+                System.out.println("User found: " + idUser + " - " + nom);
+            } else {
                 System.out.println("Aucun utilisateur trouvé avec cet ID.");
             }
         } catch (SQLException e) {

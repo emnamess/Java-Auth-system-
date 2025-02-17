@@ -13,8 +13,7 @@ public class user {
     protected int telephone;
     protected LocalDate  dateInscription;
 
-    public user(int id_user, String nom, String prenom, String email, String motDePasse, LocalDate  dateNaissance, String adresse, int telephone, LocalDate  dateInscription) {
-        this.id_user = id_user;
+    public user( String nom, String prenom, String email, String motDePasse, LocalDate  dateNaissance, String adresse, int telephone, LocalDate  dateInscription) {
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
@@ -24,6 +23,7 @@ public class user {
         this.telephone = telephone;
         this.dateInscription = dateInscription;
     }
+
     public user() {
     }
 

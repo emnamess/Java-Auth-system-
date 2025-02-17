@@ -6,8 +6,8 @@ public class organisateur extends user{
     private String workField;
     private String workEmail;
 
-    public organisateur(int id_user, String nom, String prenom, String email, String motDePasse, LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription, String workField, String workEmail) {
-        super(id_user, nom, prenom, email, motDePasse, dateNaissance, adresse, telephone, dateInscription);
+    public organisateur( String nom, String prenom, String email, String motDePasse, LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription, String workField, String workEmail) {
+        super(nom, prenom, email, motDePasse, dateNaissance, adresse, telephone, dateInscription);
         this.workField = workField;
         this.workEmail = workEmail;
     }

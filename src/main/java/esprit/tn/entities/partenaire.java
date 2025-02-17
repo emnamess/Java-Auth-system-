@@ -7,8 +7,8 @@ public class partenaire extends user {
     private String siteWeb;
     private int nbreContrats;
 
-    public partenaire(int id_user, String nom, String prenom, String email, String motDePasse, LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription, String typeService, String siteWeb, int nbreContrats) {
-        super(id_user, nom, prenom, email, motDePasse, dateNaissance, adresse, telephone, dateInscription);
+    public partenaire(String nom, String prenom, String email, String motDePasse, LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription, String typeService, String siteWeb, int nbreContrats) {
+        super(nom, prenom, email, motDePasse, dateNaissance, adresse, telephone, dateInscription);
         this.typeService = typeService;
         this.siteWeb = siteWeb;
         this.nbreContrats = nbreContrats;
