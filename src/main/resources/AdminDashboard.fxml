@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.image.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="esprit.tn.controllers.AdminDashboardController">
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.AdminDashboardController">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10;">
+            <Label style="-fx-text-fill: white;" text="Search:" textFill="#212024" />
+            <TextField fx:id="searchField" promptText="Faire une recherche" />
+        </HBox>
+    </top>
 
     <left>
-        <VBox spacing="10" alignment="CENTER" style="-fx-background-color: #2C3E50; -fx-padding: 20;">
-            <Button fx:id="btnOrganisateurs" text="Organisateurs" style="-fx-text-fill: white; -fx-background-color: transparent;" />
-            <Button fx:id="btnParticipants" text="Participants" style="-fx-text-fill: white; -fx-background-color: transparent;" />
-            <Button fx:id="btnPartenaires" text="Partenaires" style="-fx-text-fill: white; -fx-background-color: transparent;" />
+        <VBox alignment="CENTER" spacing="10" style="-fx-background-color: #2C3E50; -fx-padding: 20;">
+            <Button fx:id="btnOrganisateurs" style="-fx-text-fill: white; -fx-background-color: transparent;" text="Organisateurs" />
+            <Button fx:id="btnParticipants" style="-fx-text-fill: white; -fx-background-color: transparent;" text="Participants" />
+            <Button fx:id="btnPartenaires" style="-fx-text-fill: white; -fx-background-color: transparent;" text="Partenaires" />
         </VBox>
     </left>
 
@@ -20,14 +32,11 @@
                 <columns>
                     <TableColumn fx:id="nameColumn" text="Nom" />
                     <TableColumn fx:id="prenomColumn" text="Prénom" />
-
                     <TableColumn fx:id="emailColumn" text="Email" />
                     <TableColumn fx:id="date_naiss" text="Date De Naissance" />
-
                     <TableColumn fx:id="adresseColumn" text="Adresse" />
                     <TableColumn fx:id="telColumn" text="Numéro de téléphone" />
                     <TableColumn fx:id="date_inscription" text="Date D'inscription'" />
-
                     <TableColumn fx:id="actionColumn" text="Actions" />
                 </columns>
             </TableView>

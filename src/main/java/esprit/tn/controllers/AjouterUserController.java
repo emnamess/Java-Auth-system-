@@ -12,8 +12,16 @@ import javafx.scene.layout.VBox;
 import javafx.event.ActionEvent;
 
 public class AjouterUserController {
+    @FXML private TextField workField; // Pour organisateur
+    @FXML private TextField workEmailField; // Pour organisateur
 
-    @FXML private TextField workField;
+    @FXML private TextField typeServiceField; // Pour partenaire
+    @FXML private TextField siteWebField; // Pour partenaire
+    @FXML private TextField nbreContratsField; // Pour partenaire
+
+    @FXML private TextField nombreParticipationsField; // Pour participant
+
+
     @FXML private TextField nomField;
     @FXML private Label nomErrorLabel;
     @FXML private TextField prenomField;
@@ -58,13 +66,17 @@ public class AjouterUserController {
         adresseField.textProperty().addListener((obs, oldVal, newVal) -> validateAddress());
 
         submitButton.setDisable(true);
+        toggleFields();  // Ensure fields are updated when the form is first shown
     }
-
     private void handleCheckboxSelection(CheckBox selected) {
         organisateurCheckBox.setSelected(selected == organisateurCheckBox);
         partenaireCheckBox.setSelected(selected == partenaireCheckBox);
         participantCheckBox.setSelected(selected == participantCheckBox);
         validateRole();
+        toggleFields();
+    }
+    @FXML
+    private void handleCheckBoxAction() {
         toggleFields();
     }
 
@@ -76,14 +88,17 @@ public class AjouterUserController {
         organisateurFields.setVisible(isOrganisateur);
         organisateurFields.setManaged(isOrganisateur);
         workField.setDisable(!isOrganisateur);
+        workEmailField.setDisable(!isOrganisateur);
 
         partenaireFields.setVisible(isPartenaire);
         partenaireFields.setManaged(isPartenaire);
+        typeServiceField.setDisable(!isPartenaire);
+        siteWebField.setDisable(!isPartenaire);
+        nbreContratsField.setDisable(!isPartenaire);
 
         participantFields.setVisible(isParticipant);
         participantFields.setManaged(isParticipant);
-
-        validateRole();
+        nombreParticipationsField.setDisable(!isParticipant);
     }
 
     private void validateNom() {
@@ -187,19 +202,25 @@ public class AjouterUserController {
         if (participantCheckBox.isSelected()) {
             newUser = new participant(nomField.getText(), prenomField.getText(), emailField.getText(),
                     passwordField.getText(), dobField.getValue(), adresseField.getText(),
-                    Integer.parseInt(telephoneField.getText()), dateInscription, 0);
+                    Integer.parseInt(telephoneField.getText()), dateInscription,
+                    Integer.parseInt(nombreParticipationsField.getText())); // Ajout du champ participant
         } else if (partenaireCheckBox.isSelected()) {
             newUser = new partenaire(nomField.getText(), prenomField.getText(), emailField.getText(),
                     passwordField.getText(), dobField.getValue(), adresseField.getText(),
-                    Integer.parseInt(telephoneField.getText()), dateInscription, "TypeService", "SiteWeb", 0);
+                    Integer.parseInt(telephoneField.getText()), dateInscription,
+                    typeServiceField.getText(), siteWebField.getText(),
+                    Integer.parseInt(nbreContratsField.getText())); // Ajout des champs partenaire
         } else if (organisateurCheckBox.isSelected()) {
             newUser = new organisateur(nomField.getText(), prenomField.getText(), emailField.getText(),
                     passwordField.getText(), dobField.getValue(), adresseField.getText(),
                     Integer.parseInt(telephoneField.getText()), dateInscription,
-                    workField.getText(), "WorkEmail");
+                    workField.getText(), workEmailField.getText()); // Ajout des champs organisateur
         }
 
-        userService.ajouter(newUser);
-        showAlert("Succès", "Utilisateur ajouté avec succès !");
+        if (newUser != null) {
+            userService.ajouter(newUser);
+            showAlert("Succès", "Utilisateur ajouté avec succès !");
+        }
     }
+
 }

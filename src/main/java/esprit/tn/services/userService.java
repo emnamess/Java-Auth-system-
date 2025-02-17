@@ -211,6 +211,9 @@ public class userService implements Iservice<user> {
 
                 user u = new user(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate());
 
+                // ✅ Assign id_user to the object
+                u.setId_user(id);
+
                 // Check if user is a participant
                 String reqParticipant = "SELECT nombreParticipations FROM participants WHERE id_user = ?";
                 PreparedStatement stmParticipant = cnx.prepareStatement(reqParticipant);
@@ -218,7 +221,7 @@ public class userService implements Iservice<user> {
                 ResultSet rsParticipant = stmParticipant.executeQuery();
                 if (rsParticipant.next()) {
                     int nombreParticipations = rsParticipant.getInt("nombreParticipations");
-                    u = new participant( nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), nombreParticipations);
+                    u = new participant(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), nombreParticipations);
                 }
 
                 // Check if user is a partenaire
@@ -254,12 +257,16 @@ public class userService implements Iservice<user> {
                     u = new admin(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), createdAt);
                 }
 
+                // ✅ Ensure id_user is still set after type conversion
+                u.setId_user(id);
+
                 users.add(u);
             }
 
             for (user u : users) {
-                System.out.println(u.getNom());
-            }        } catch (SQLException e) {
+                System.out.println("User ID: " + u.getId_user() + ", Name: " + u.getNom());
+            }
+        } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de la récupération des utilisateurs : " + e.getMessage());
         }
 

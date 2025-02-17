@@ -30,7 +30,7 @@ public class AdminDashboardController {
     @FXML private TableColumn<user, String> telColumn;
     @FXML private TableColumn<user, String> date_inscription;
     @FXML private TableColumn<user, Void> actionColumn; // Delete button column
-
+    @FXML private TextField searchField;
     private TableColumn<user, String> extraColumn1;
     private TableColumn<user, String> extraColumn2;
     private TableColumn<user, Integer> extraColumn3;
@@ -46,6 +46,34 @@ public class AdminDashboardController {
         btnOrganisateurs.setOnAction(e -> loadUsers(organisateur.class));
         btnParticipants.setOnAction(e -> loadUsers(participant.class));
         btnPartenaires.setOnAction(e -> loadUsers(partenaire.class));
+
+        // Search field listener
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterUsers(newValue);
+        });
+    }
+    private void filterUsers(String searchTerm) {
+        if (searchTerm.isEmpty()) {
+            usersTable.setItems(userList); // Reset table if search is empty
+            return;
+        }
+
+        List<user> filteredUsers;
+
+        try {
+            int id = Integer.parseInt(searchTerm);
+            user foundUser = userService.getOne(id);
+            filteredUsers = (foundUser != null) ? List.of(foundUser) : List.of();
+        } catch (NumberFormatException e) {
+            // If not a number, filter by name, email, etc.
+            filteredUsers = userList.stream()
+                    .filter(user -> user.getNom().toLowerCase().contains(searchTerm.toLowerCase()) ||
+                            user.getPrenom().toLowerCase().contains(searchTerm.toLowerCase()) ||
+                            user.getEmail().toLowerCase().contains(searchTerm.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        usersTable.setItems(FXCollections.observableArrayList(filteredUsers));
     }
 
     private void setupTable() {
@@ -102,43 +130,12 @@ public class AdminDashboardController {
     }
 
     private void loadUsers(Class<? extends user> userType) {
-        usersTable.getColumns().removeAll(extraColumn1, extraColumn2, extraColumn3);
+        List<user> filteredUsers = userService.getall();
 
-        List<user> allUsers = userService.getall();
-        List<user> filteredUsers;
-
-        if (userType == null) {
-            filteredUsers = allUsers;
-        } else {
-            filteredUsers = allUsers.stream()
+        if (userType != null) {
+            filteredUsers = filteredUsers.stream()
                     .filter(userType::isInstance)
                     .collect(Collectors.toList());
-
-            if (userType.equals(organisateur.class)) {
-                extraColumn1 = new TableColumn<>("Work Field");
-                extraColumn1.setCellValueFactory(new PropertyValueFactory<>("workField"));
-
-                extraColumn2 = new TableColumn<>("Work Email");
-                extraColumn2.setCellValueFactory(new PropertyValueFactory<>("workEmail"));
-
-                usersTable.getColumns().addAll(extraColumn1, extraColumn2);
-            } else if (userType.equals(partenaire.class)) {
-                extraColumn1 = new TableColumn<>("Service Type");
-                extraColumn1.setCellValueFactory(new PropertyValueFactory<>("typeService"));
-
-                extraColumn2 = new TableColumn<>("Website");
-                extraColumn2.setCellValueFactory(new PropertyValueFactory<>("siteWeb"));
-
-                extraColumn3 = new TableColumn<>("Contracts");
-                extraColumn3.setCellValueFactory(new PropertyValueFactory<>("nbreContrats"));
-
-                usersTable.getColumns().addAll(extraColumn1, extraColumn2, extraColumn3);
-            } else if (userType.equals(participant.class)) {
-                extraColumn1 = new TableColumn<>("Participations");
-                extraColumn1.setCellValueFactory(new PropertyValueFactory<>("nombreParticipations"));
-
-                usersTable.getColumns().add(extraColumn1);
-            }
         }
 
         userList.setAll(filteredUsers);
