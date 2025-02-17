@@ -12,9 +12,9 @@ public class Main {
 
         //user participant = new participant("Alice", "Durand", "alice@example.com", "password123",LocalDate.of(1995, 5, 20), "123 Rue des Fleurs", 123456789, LocalDate.now(),50);
         //user partenaire = new partenaire("emna", "messaoudi", "emna@example.com", "password123",LocalDate.of(1995, 5, 20), "123 Rue des zombies", 123456789, LocalDate.now(),"service1","www.service.com",44);
-        user organisateur = new organisateur("emna", "messaoudi", "emna@example.com", "password123",LocalDate.of(1995, 5, 20), "123 Rue des zombies", 123456789, LocalDate.now(),"it","it@example.com");
+        //user organisateur = new organisateur("emna", "messaoudi", "emna@example.com", "password123",LocalDate.of(1995, 5, 20), "123 Rue des zombies", 123456789, LocalDate.now(),"it","it@example.com");
         //user admin = new admin("emna", "messaoudi", "emna@example.com", "password123", LocalDate.of(1995, 5, 20), "123 Rue des zombies", 123456789, LocalDate.now(),LocalDate.of(2001,12,01));
-        userservice.ajouter(organisateur);
+        //userservice.ajouter(organisateur);
 //        user existingUser = userservice.getOne(6);
 //        if (existingUser != null) {
 //            // Modify some attributes
@@ -31,7 +31,7 @@ public class Main {
 //        } else {
 //            System.out.println("Utilisateur non trouvé !");
 //        }
-        //userservice.supprimer(1);
+        //userservice.supprimer(2);
         //userservice.getall();
         //userservice.getOne(5);
     }

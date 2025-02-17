@@ -41,22 +41,26 @@
             <CheckBox fx:id="organisateurCheckBox" text="Organisateur" />
             <CheckBox fx:id="partenaireCheckBox" text="Partenaire" />
             <CheckBox fx:id="participantCheckBox" text="Participant" />
+            <Label fx:id="roleErrorLabel" text="" textFill="red" />
+
             <Button fx:id="submitButton" onAction="#handleSignUp" style="-fx-background-color: #4facfe; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="Sign Up" />
-        </VBox>
-        <VBox fx:id="organisateurFields" visible="false" managed="false">
-            <TextField fx:id="workField" promptText="Work Field" />
-            <TextField fx:id="workEmail" promptText="Work Email" />
+            <VBox fx:id="organisateurFields" visible="false" managed="false">
+                <Label text="Champ spécifique pour Organisateur" />
+                <TextField fx:id="workField" promptText="Champ spécifique pour Organisateur"/>
+            </VBox>
+
+            <VBox fx:id="partenaireFields" visible="false" managed="false">
+                <Label text="Champ spécifique pour Partenaire" />
+                <TextField fx:id="serviceTypeField" promptText="Champ spécifique pour Partenaire"/>
+            </VBox>
+
+            <VBox fx:id="participantFields" visible="false" managed="false">
+                <Label text="Champ spécifique pour Participant" />
+                <TextField fx:id="participantField" promptText="Champ spécifique pour Participant"/>
+            </VBox>
         </VBox>
 
-        <VBox fx:id="partenaireFields" visible="false" managed="false">
-            <TextField fx:id="typeServiceField" promptText="Type de Service" />
-            <TextField fx:id="siteWebField" promptText="Site Web" />
-            <TextField fx:id="nbreContratsField" promptText="Nombre de Contrats" />
-        </VBox>
 
-        <VBox fx:id="participantFields" visible="false" managed="false">
-            <TextField fx:id="nombreParticipationsField" promptText="Nombre de Participations" />
-        </VBox>
 
     </children>
 

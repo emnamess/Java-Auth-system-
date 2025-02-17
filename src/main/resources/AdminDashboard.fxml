@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="esprit.tn.controllers.AdminDashboardController">
+
+    <left>
+        <VBox spacing="10" alignment="CENTER" style="-fx-background-color: #2C3E50; -fx-padding: 20;">
+            <Button fx:id="btnOrganisateurs" text="Organisateurs" style="-fx-text-fill: white; -fx-background-color: transparent;" />
+            <Button fx:id="btnParticipants" text="Participants" style="-fx-text-fill: white; -fx-background-color: transparent;" />
+            <Button fx:id="btnPartenaires" text="Partenaires" style="-fx-text-fill: white; -fx-background-color: transparent;" />
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="10">
+            <TableView fx:id="usersTable">
+                <columns>
+                    <TableColumn fx:id="nameColumn" text="Nom" />
+                    <TableColumn fx:id="prenomColumn" text="Prénom" />
+
+                    <TableColumn fx:id="emailColumn" text="Email" />
+                    <TableColumn fx:id="date_naiss" text="Date De Naissance" />
+
+                    <TableColumn fx:id="adresseColumn" text="Adresse" />
+                    <TableColumn fx:id="telColumn" text="Numéro de téléphone" />
+                    <TableColumn fx:id="date_inscription" text="Date D'inscription'" />
+
+                    <TableColumn fx:id="actionColumn" text="Actions" />
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+
+</BorderPane>
