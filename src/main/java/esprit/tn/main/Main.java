@@ -8,20 +8,17 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.time.LocalDate;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         DatabaseConnection.getInstance();
         userService userservice = new userService();
         authentificationService authService = new authentificationService();
         String email = "emna@example.com";
         String password = "password123";
 
-        try {
-            String token = authService.login(email, password);
-            System.out.println("✅ Authentication successful!");
-            System.out.println("🔑 JWT Token: " + token);
-        } catch (Exception e) {
-            System.out.println("❌ Authentication failed: " + e.getMessage());
-        }
+        user loggedInUser = authService.login(email, password);
+        System.out.println("✅ Authentication successful!");
+        System.out.println("🔑 JWT Token: " + loggedInUser.getJwtToken()); // Get the token from the user object
+
     }
 
 

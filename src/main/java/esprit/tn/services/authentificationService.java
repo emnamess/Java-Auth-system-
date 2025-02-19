@@ -14,7 +14,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +27,7 @@ public class authentificationService {
         cnx = DatabaseConnection.getInstance().getCnx();
     }
 
-    public String login(String email, String password) throws Exception {
+    public user login(String email, String password) throws Exception {
         String query = "SELECT * FROM user WHERE email = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setString(1, email);
@@ -45,24 +44,34 @@ public class authentificationService {
                     int telephone = rs.getInt("telephone");
                     LocalDate dateInscription = rs.getDate("date_inscription").toLocalDate();
 
-                    // Determine user type
-                    String userType = null;
                     user userInstance = null;
+                    String userType = "";
 
                     if (isOrganisateur(id)) {
-                        userType = "organisateur";
                         userInstance = getOrganisateur(id, nom, prenom, email, storedHashedPassword, dateNaissance, adresse, telephone, dateInscription);
+                        userType = "organisateur";
                     } else if (isPartenaire(id)) {
-                        userType = "partenaire";
                         userInstance = getPartenaire(id, nom, prenom, email, storedHashedPassword, dateNaissance, adresse, telephone, dateInscription);
+                        userType = "partenaire";
                     } else if (isParticipant(id)) {
-                        userType = "participant";
                         userInstance = getParticipant(id, nom, prenom, email, storedHashedPassword, dateNaissance, adresse, telephone, dateInscription);
+                        userType = "participant";
                     }
 
                     if (userInstance != null) {
-                        return generateJwtToken(userInstance, userType);
+                        String token = generateJwtToken(userInstance, userType);
+                        userInstance.setJwtToken(token);
+                        return userInstance;
                     }
+                    System.out.println("User logged in: " + userInstance);
+                    if (userInstance instanceof organisateur) {
+                        System.out.println("Organisateur detected: " + ((organisateur) userInstance).toString());
+                    } else if (userInstance instanceof partenaire) {
+                        System.out.println("Partenaire detected: " + ((partenaire) userInstance).toString());
+                    } else if (userInstance instanceof participant) {
+                        System.out.println("Participant detected: " + ((participant) userInstance).toString());
+                    }
+
                 }
             }
         }
@@ -88,17 +97,14 @@ public class authentificationService {
                 .compact();
     }
 
-    // 🟢 Check if user is an Organisateur
     private boolean isOrganisateur(int Id_user) throws Exception {
         return checkUserType(Id_user, "organisateur");
     }
 
-    // 🟢 Check if user is a Partenaire
     private boolean isPartenaire(int Id_user) throws Exception {
         return checkUserType(Id_user, "partenaire");
     }
 
-    // 🟢 Check if user is a Participant
     private boolean isParticipant(int Id_user) throws Exception {
         return checkUserType(Id_user, "participant");
     }
@@ -112,7 +118,6 @@ public class authentificationService {
         }
     }
 
-    // 🟢 Get Organisateur Data
     private organisateur getOrganisateur(int Id_user, String nom, String prenom, String email, String password, LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription) throws Exception {
         String query = "SELECT workField, workEmail FROM organisateur WHERE Id_user = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
@@ -127,7 +132,6 @@ public class authentificationService {
         return null;
     }
 
-    // 🟢 Get Partenaire Data
     private partenaire getPartenaire(int Id_user, String nom, String prenom, String email, String password, LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription) throws Exception {
         String query = "SELECT typeService, siteWeb, nbreContrats FROM partenaire WHERE Id_user = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
@@ -143,7 +147,6 @@ public class authentificationService {
         return null;
     }
 
-    // 🟢 Get Participant Data
     private participant getParticipant(int Id_user, String nom, String prenom, String email, String password, LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription) throws Exception {
         String query = "SELECT nombreParticipations FROM participant WHERE Id_user = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
