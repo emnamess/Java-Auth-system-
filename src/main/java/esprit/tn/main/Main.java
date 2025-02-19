@@ -12,20 +12,19 @@ public class Main {
         DatabaseConnection.getInstance();
         userService userservice = new userService();
         authentificationService authService = new authentificationService();
+        String email = "emna@example.com";
+        String password = "password123";
 
-
-        String testUsername = "emna@example.com";
-        String testPassword = "password123";
-
-        user loggedInUser = authService.login(testUsername, testPassword);
-
-        if (loggedInUser != null) {
-            System.out.println("✅ Login successful!");
-            System.out.println("User Info: " + loggedInUser);
-        } else {
-            System.out.println("❌ Login failed! Invalid credentials.");
+        try {
+            String token = authService.login(email, password);
+            System.out.println("✅ Authentication successful!");
+            System.out.println("🔑 JWT Token: " + token);
+        } catch (Exception e) {
+            System.out.println("❌ Authentication failed: " + e.getMessage());
         }
     }
+
+
         //user participant = new participant("Alice", "Durand", "alice@example.com", "password123",LocalDate.of(1995, 5, 20), "123 Rue des Fleurs", 123456789, LocalDate.now(),50);
         //user partenaire = new partenaire("emna", "messaoudi", "emna@example.com", "password123",LocalDate.of(1995, 5, 20), "123 Rue des zombies", 123456789, LocalDate.now(),"service1","www.service.com",44);
         //user organisateur = new organisateur("emna", "messaoudi", "emna@example.com", "password123",LocalDate.of(1995, 5, 20), "123 Rue des zombies", 123456789, LocalDate.now(),"it","it@example.com");
