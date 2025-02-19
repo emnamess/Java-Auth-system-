@@ -4,8 +4,10 @@ import esprit.tn.entities.*;
 import esprit.tn.services.authentificationService;
 import esprit.tn.services.userService;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -68,6 +70,21 @@ public class LoginController {
             e.printStackTrace(); // Log error for debugging
             messageLabel.setText("❌ Login failed due to an error: " + e.getMessage());
             messageLabel.setStyle("-fx-text-fill: red;");
+        }
+    }
+    @FXML
+    private void handleSignup(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/AjouterUser.fxml"));
+            Parent signupPage = loader.load();
+
+            // Get the current stage
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene scene = new Scene(signupPage);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
