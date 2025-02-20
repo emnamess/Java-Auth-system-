@@ -12,15 +12,14 @@ import javafx.scene.layout.VBox;
 import javafx.event.ActionEvent;
 
 public class AjouterUserController {
-    @FXML private TextField workField; // Pour organisateur
-    @FXML private TextField workEmailField; // Pour organisateur
+    @FXML private TextField workField;
+    @FXML private TextField workEmailField;
 
-    @FXML private TextField typeServiceField; // Pour partenaire
-    @FXML private TextField siteWebField; // Pour partenaire
-    @FXML private TextField nbreContratsField; // Pour partenaire
+    @FXML private TextField typeServiceField;
+    @FXML private TextField siteWebField;
+    @FXML private TextField nbreContratsField;
 
-    @FXML private TextField nombreParticipationsField; // Pour participant
-
+    @FXML private TextField nombreParticipationsField;
 
     @FXML private TextField nomField;
     @FXML private Label nomErrorLabel;
@@ -38,10 +37,6 @@ public class AjouterUserController {
     @FXML private Label adresseErrorLabel;
     @FXML private TextField telephoneField;
     @FXML private Label telephoneErrorLabel;
-    @FXML private CheckBox organisateurCheckBox;
-    @FXML private CheckBox partenaireCheckBox;
-    @FXML private CheckBox participantCheckBox;
-    @FXML private Label roleErrorLabel;
     @FXML private Button submitButton;
 
     @FXML private VBox organisateurFields;
@@ -49,13 +44,15 @@ public class AjouterUserController {
     @FXML private VBox participantFields;
 
     private final userService userService = new userService();
+    private String userType; // Variable to store the user type
+
+    public void setUserInstance(String userType) {
+        this.userType = userType;
+        toggleFields(); // Show relevant fields based on the instance
+    }
 
     @FXML
     private void initialize() {
-        organisateurCheckBox.setOnAction(event -> handleCheckboxSelection(organisateurCheckBox));
-        partenaireCheckBox.setOnAction(event -> handleCheckboxSelection(partenaireCheckBox));
-        participantCheckBox.setOnAction(event -> handleCheckboxSelection(participantCheckBox));
-
         nomField.textProperty().addListener((obs, oldVal, newVal) -> validateNom());
         prenomField.textProperty().addListener((obs, oldVal, newVal) -> validatePrenom());
         emailField.textProperty().addListener((obs, oldVal, newVal) -> validateEmail());
@@ -66,24 +63,12 @@ public class AjouterUserController {
         adresseField.textProperty().addListener((obs, oldVal, newVal) -> validateAddress());
 
         submitButton.setDisable(true);
-        toggleFields();  // Ensure fields are updated when the form is first shown
-    }
-    private void handleCheckboxSelection(CheckBox selected) {
-        organisateurCheckBox.setSelected(selected == organisateurCheckBox);
-        partenaireCheckBox.setSelected(selected == partenaireCheckBox);
-        participantCheckBox.setSelected(selected == participantCheckBox);
-        validateRole();
-        toggleFields();
-    }
-    @FXML
-    private void handleCheckBoxAction() {
-        toggleFields();
     }
 
     private void toggleFields() {
-        boolean isOrganisateur = organisateurCheckBox.isSelected();
-        boolean isPartenaire = partenaireCheckBox.isSelected();
-        boolean isParticipant = participantCheckBox.isSelected();
+        boolean isOrganisateur = "organisateur".equals(userType);
+        boolean isPartenaire = "partenaire".equals(userType);
+        boolean isParticipant = "participant".equals(userType);
 
         organisateurFields.setVisible(isOrganisateur);
         organisateurFields.setManaged(isOrganisateur);
@@ -165,14 +150,6 @@ public class AjouterUserController {
         validateForm();
     }
 
-    private void validateRole() {
-        roleErrorLabel.setText(
-                (!organisateurCheckBox.isSelected() && !partenaireCheckBox.isSelected() && !participantCheckBox.isSelected())
-                        ? "Sélectionnez un rôle !" : ""
-        );
-        validateForm();
-    }
-
     private void validateForm() {
         boolean isValid = nomErrorLabel.getText().isEmpty() &&
                 prenomErrorLabel.getText().isEmpty() &&
@@ -181,11 +158,11 @@ public class AjouterUserController {
                 confirmPasswordErrorLabel.getText().isEmpty() &&
                 telephoneErrorLabel.getText().isEmpty() &&
                 dobErrorLabel.getText().isEmpty() &&
-                adresseErrorLabel.getText().isEmpty() &&
-                roleErrorLabel.getText().isEmpty();
+                adresseErrorLabel.getText().isEmpty();
 
         submitButton.setDisable(!isValid);
     }
+
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -199,22 +176,22 @@ public class AjouterUserController {
         LocalDate dateInscription = LocalDate.now();
         user newUser = null;
 
-        if (participantCheckBox.isSelected()) {
+        if ("participant".equals(userType)) {
             newUser = new participant(nomField.getText(), prenomField.getText(), emailField.getText(),
                     passwordField.getText(), dobField.getValue(), adresseField.getText(),
                     Integer.parseInt(telephoneField.getText()), dateInscription,
-                    Integer.parseInt(nombreParticipationsField.getText())); // Ajout du champ participant
-        } else if (partenaireCheckBox.isSelected()) {
+                    Integer.parseInt(nombreParticipationsField.getText()));
+        } else if ("partenaire".equals(userType)) {
             newUser = new partenaire(nomField.getText(), prenomField.getText(), emailField.getText(),
                     passwordField.getText(), dobField.getValue(), adresseField.getText(),
                     Integer.parseInt(telephoneField.getText()), dateInscription,
                     typeServiceField.getText(), siteWebField.getText(),
-                    Integer.parseInt(nbreContratsField.getText())); // Ajout des champs partenaire
-        } else if (organisateurCheckBox.isSelected()) {
+                    Integer.parseInt(nbreContratsField.getText()));
+        } else if ("organisateur".equals(userType)) {
             newUser = new organisateur(nomField.getText(), prenomField.getText(), emailField.getText(),
                     passwordField.getText(), dobField.getValue(), adresseField.getText(),
                     Integer.parseInt(telephoneField.getText()), dateInscription,
-                    workField.getText(), workEmailField.getText()); // Ajout des champs organisateur
+                    workField.getText(), workEmailField.getText());
         }
 
         if (newUser != null) {
@@ -222,5 +199,4 @@ public class AjouterUserController {
             showAlert("Succès", "Utilisateur ajouté avec succès !");
         }
     }
-
 }

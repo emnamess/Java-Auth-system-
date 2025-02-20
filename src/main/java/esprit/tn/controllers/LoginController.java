@@ -1,9 +1,9 @@
 package esprit.tn.controllers;
 
-import esprit.tn.entities.*;
+import esprit.tn.entities.JwtUtils;
+import esprit.tn.entities.SessionManager;
+import esprit.tn.entities.user;
 import esprit.tn.services.authentificationService;
-import esprit.tn.services.userService;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,7 +14,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
-
 import java.io.IOException;
 
 public class LoginController {
@@ -23,55 +22,66 @@ public class LoginController {
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
 
-    private final userService userService = new userService();
+    private final authentificationService authService = new authentificationService();
 
     @FXML
-
     private void handleLogin() {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        // Check for empty fields
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             messageLabel.setText("⚠ Username and password cannot be empty.");
             messageLabel.setStyle("-fx-text-fill: red;");
-            return; // Stop execution if fields are empty
+            return;
         }
 
         try {
-            user loggedInUser = authenticate(username, password);
+            user authenticatedUser = authenticate(username, password);
 
-            if (loggedInUser != null) {
+            if (authenticatedUser != null && authenticatedUser.getJwtToken() != null) {
                 messageLabel.setText("✅ Login successful!");
                 messageLabel.setStyle("-fx-text-fill: green;");
 
-                try {
-                    // Determine user role and navigate accordingly
-                    if (loggedInUser instanceof organisateur) {
-                        loadDashboard("organisateur.fxml");
-                    } else if (loggedInUser instanceof partenaire) {
-                        loadDashboard("partenaire.fxml");
-                    } else if (loggedInUser instanceof participant) {
-                        loadDashboard("participant.fxml");
-                    } else {
-                        messageLabel.setText("⚠ Unknown user type.");
-                        messageLabel.setStyle("-fx-text-fill: red;");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace(); // Log error in console
-                    messageLabel.setText("❌ Error loading the dashboard: " + e.getMessage());
-                    messageLabel.setStyle("-fx-text-fill: red;");
-                }
+                // Store token in session
+                String token = authenticatedUser.getJwtToken();
+                SessionManager.setToken(token);
+
+                // Extract user type from JWT and load dashboard
+                String userType = JwtUtils.extractRole(token);
+                loadDashboardBasedOnRole(userType);
             } else {
                 messageLabel.setText("❌ Invalid username or password.");
                 messageLabel.setStyle("-fx-text-fill: red;");
             }
         } catch (Exception e) {
-            e.printStackTrace(); // Log error for debugging
+            e.printStackTrace();
             messageLabel.setText("❌ Login failed due to an error: " + e.getMessage());
             messageLabel.setStyle("-fx-text-fill: red;");
         }
     }
+
+
+    private void loadDashboardBasedOnRole(String userType) {
+        switch (userType) {
+            case "organisateur":
+                loadDashboard("organisateur.fxml");
+                break;
+            case "partenaire":
+                loadDashboard("partenaire.fxml");
+                break;
+            case "participant":
+                loadDashboard("participant.fxml");
+                break;
+            case "admin":
+                loadDashboard("admin.fxml");
+                break;
+            default:
+                messageLabel.setText("⚠ Unknown user type.");
+                messageLabel.setStyle("-fx-text-fill: red;");
+                break;
+        }
+    }
+
     @FXML
     private void handleSignup(ActionEvent event) {
         try {
@@ -88,27 +98,18 @@ public class LoginController {
         }
     }
 
-
     private user authenticate(String username, String password) {
         try {
-            return new authentificationService().login(username, password);
+            return authService.login(username, password); // Return the user object instead of token
         } catch (Exception e) {
-            e.printStackTrace(); // Log the error
-            return null; // Handle it gracefully
+            e.printStackTrace();
+            return null;
         }
     }
 
-
     private void loadDashboard(String fxmlFile) {
         try {
-            String resourcePath = "/" + fxmlFile;
-            System.out.println("Trying to load FXML: " + resourcePath);
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
-            if (loader.getLocation() == null) {
-                throw new IOException("FXML file not found at: " + resourcePath);
-            }
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/" + fxmlFile));
             Parent root = loader.load();
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
