@@ -1,16 +1,28 @@
 package esprit.tn.controllers;
 
+import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
 import java.io.IOException;
 
 public class PageAcceuilController {
+    @FXML
+    private HBox selectionContainer;
 
+    public void initialize() {
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1), selectionContainer);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.play();
+    }
     @FXML
     private void handlePartenaireSelection(ActionEvent event) {
         navigateToAjouterUser(event, "partenaire");

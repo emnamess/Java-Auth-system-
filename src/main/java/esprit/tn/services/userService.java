@@ -72,14 +72,7 @@ public class userService implements Iservice<user> {
                     stmOrganisateur.executeUpdate();
                 }
 
-                // If user is an admin, insert into admin table
-                if (user instanceof admin) {
-                    String reqAdmin = "INSERT INTO admin (id_user, createdAt) VALUES (?, ?)";
-                    PreparedStatement stmAdmin = cnx.prepareStatement(reqAdmin);
-                    stmAdmin.setInt(1, userId);
-                    stmAdmin.setDate(2, java.sql.Date.valueOf(((admin) user).getCreatedAt()));
-                    stmAdmin.executeUpdate();
-                }
+
             }
 
             System.out.println("Utilisateur ajouté avec succès !");

@@ -85,7 +85,7 @@ public class LoginController {
     @FXML
     private void handleSignup(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/AjouterUser.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Page_acceuil.fxml"));
             Parent signupPage = loader.load();
 
             // Get the current stage

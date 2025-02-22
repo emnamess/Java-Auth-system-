@@ -8,6 +8,8 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Hyperlink?>
 <AnchorPane prefHeight="650.0" prefWidth="855.0" style="-fx-background-color: linear-gradient(to bottom, #004369, #b1d4e0, #2e4963);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.AjouterUserController">
     <children>
         <VBox alignment="CENTER" layoutX="238.0" layoutY="40.0" prefHeight="550.0" prefWidth="378.0" spacing="10" style="-fx-background-color: white; -fx-padding: 30; -fx-border-radius: 50; -fx-background-radius: 50; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);">
@@ -41,23 +43,41 @@
                 <VBox fx:id="organisateurFields" managed="false" visible="false">
                     <Label text="Informations Organisateur" />
                     <TextField fx:id="workField" promptText="Travail" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
+                    <Label fx:id="workErrorLabel" text="" style="-fx-text-fill: red;" managed="true" visible="true"/>
+
                     <TextField fx:id="workEmailField" promptText="Email Professionnel" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
+                    <Label fx:id="workEmailErrorLabel" text="" style="-fx-text-fill: red;" />
+
                 </VBox>
 
                 <VBox fx:id="partenaireFields" managed="false" visible="false">
                     <Label text="Informations Partenaire" />
                     <TextField fx:id="typeServiceField" promptText="Type de Service" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
+                    <Label fx:id="typeServiceErrorLabel" text="" style="-fx-text-fill: red;" />
+
                     <TextField fx:id="siteWebField" promptText="Site Web" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
+                    <Label fx:id="siteWebErrorLabel" text="" style="-fx-text-fill: red;" />
+
                     <TextField fx:id="nbreContratsField" promptText="Nombre de Contrats" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
+                    <Label fx:id="nbreContratsErrorLabel" text="" style="-fx-text-fill: red;" />
+
                 </VBox>
 
                 <VBox fx:id="participantFields" managed="false" visible="false">
                     <Label text="Informations Participant" />
                     <TextField fx:id="nombreParticipationsField" promptText="Nombre de Participations" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
+                    <Label fx:id="nombreParticipationsErrorLabel" text="" style="-fx-text-fill: red;" />
                 </VBox>
             </VBox>
 
-            <Button fx:id="submitButton" onAction="#handleSignUp" style="-fx-background-color: #4facfe; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="S'inscrire" />
+            <Button fx:id="submitButton" onAction="#handleSignUp"
+                    disable="true"
+                    style="-fx-background-color: #4facfe; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;"
+                    text="S'inscrire" />
+            <HBox spacing="5">
+                <Label text="Vous avez déja un compte ?" style="-fx-text-fill: #333;" />
+                <Hyperlink fx:id="LoginLink" text="Se connecter" onAction="#handleLogin" style="-fx-text-fill: #2575fc; -fx-font-weight: bold;" />
+            </HBox>
         </VBox>
     </children>
 </AnchorPane>

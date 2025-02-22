@@ -106,7 +106,7 @@ public class authentificationService {
     }
 
     private boolean isParticipant(int Id_user) throws Exception {
-        return checkUserType(Id_user, "participant");
+        return checkUserType(Id_user, "participants");
     }
 
     private boolean checkUserType(int Id_user, String tableName) throws Exception {
@@ -148,7 +148,7 @@ public class authentificationService {
     }
 
     private participant getParticipant(int Id_user, String nom, String prenom, String email, String password, LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription) throws Exception {
-        String query = "SELECT nombreParticipations FROM participant WHERE Id_user = ?";
+        String query = "SELECT nombreParticipations FROM participants WHERE Id_user = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setInt(1, Id_user);
             ResultSet rs = stmt.executeQuery();
