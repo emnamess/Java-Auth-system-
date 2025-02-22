@@ -1,5 +1,7 @@
 package esprit.tn.services;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import esprit.tn.entities.user;
 import esprit.tn.entities.organisateur;
 import esprit.tn.entities.partenaire;
@@ -20,6 +22,9 @@ import java.util.Map;
 
 public class authentificationService {
     private static final String SECRET_KEY = "p4/JkLtFcXR/Kp2MWRYflQhINQGwYra953et6lb07eE=";
+    private static final String TABLE_ORGANISATEUR = "organisateur";
+    private static final String TABLE_PARTENAIRE = "partenaire";
+    private static final String TABLE_PARTICIPANT = "participants";
 
     Connection cnx;
 
@@ -59,62 +64,54 @@ public class authentificationService {
                     }
 
                     if (userInstance != null) {
+                        System.out.println("User Type Identified: " + userType);
                         String token = generateJwtToken(userInstance, userType);
                         userInstance.setJwtToken(token);
+                        System.out.println("User logged in: " + userInstance);
                         return userInstance;
                     }
-                    System.out.println("User logged in: " + userInstance);
-                    if (userInstance instanceof organisateur) {
-                        System.out.println("Organisateur detected: " + ((organisateur) userInstance).toString());
-                    } else if (userInstance instanceof partenaire) {
-                        System.out.println("Partenaire detected: " + ((partenaire) userInstance).toString());
-                    } else if (userInstance instanceof participant) {
-                        System.out.println("Participant detected: " + ((participant) userInstance).toString());
-                    }
-
                 }
             }
         }
         throw new Exception("Invalid credentials");
     }
 
-    private String generateJwtToken(user userInstance, String userType) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("id", userInstance.getId_user());
-        claims.put("nom", userInstance.getNom());
-        claims.put("prenom", userInstance.getPrenom());
-        claims.put("email", userInstance.getEmail());
-        claims.put("userType", userType);
-
-        Instant now = Instant.now();
-        Instant expiry = now.plusSeconds(3600); // Token valid for 1 hour
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(expiry))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-                .compact();
+    private String generateJwtToken(user authenticatedUser, String role) {
+        return JWT.create()
+                .withClaim("email", authenticatedUser.getEmail())
+                .withClaim("role", role) // Store role dynamically
+                .sign(Algorithm.HMAC256(SECRET_KEY));
+    }
+    private String getRoleFromInstance(user authenticatedUser) {
+        if (authenticatedUser instanceof organisateur) {
+            return "organisateur";
+        } else if (authenticatedUser instanceof partenaire) {
+            return "partenaire";
+        } else if (authenticatedUser instanceof participant) {
+            return "participant";
+        } else {
+            return "unknown"; // Handle unexpected cases
+        }
     }
 
     private boolean isOrganisateur(int Id_user) throws Exception {
-        return checkUserType(Id_user, "organisateur");
+        return checkUserType(Id_user, TABLE_ORGANISATEUR);
     }
 
     private boolean isPartenaire(int Id_user) throws Exception {
-        return checkUserType(Id_user, "partenaire");
+        return checkUserType(Id_user, TABLE_PARTENAIRE);
     }
 
     private boolean isParticipant(int Id_user) throws Exception {
-        return checkUserType(Id_user, "participants");
+        return checkUserType(Id_user, TABLE_PARTICIPANT);
     }
 
     private boolean checkUserType(int Id_user, String tableName) throws Exception {
-        String query = "SELECT COUNT(*) FROM " + tableName + " WHERE Id_user = ?";
+        String query = "SELECT 1 FROM " + tableName + " WHERE Id_user = ? LIMIT 1";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setInt(1, Id_user);
             ResultSet rs = stmt.executeQuery();
-            return rs.next() && rs.getInt(1) > 0;
+            return rs.next();
         }
     }
 
@@ -124,9 +121,7 @@ public class authentificationService {
             stmt.setInt(1, Id_user);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                String workField = rs.getString("workField");
-                String workEmail = rs.getString("workEmail");
-                return new organisateur(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription, workField, workEmail);
+                return new organisateur(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription, rs.getString("workField"), rs.getString("workEmail"));
             }
         }
         return null;
@@ -138,10 +133,7 @@ public class authentificationService {
             stmt.setInt(1, Id_user);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                String typeService = rs.getString("typeService");
-                String siteWeb = rs.getString("siteWeb");
-                int nbreContrats = rs.getInt("nbreContrats");
-                return new partenaire(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription, typeService, siteWeb, nbreContrats);
+                return new partenaire(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription, rs.getString("typeService"), rs.getString("siteWeb"), rs.getInt("nbreContrats"));
             }
         }
         return null;
@@ -153,8 +145,7 @@ public class authentificationService {
             stmt.setInt(1, Id_user);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                int nombreParticipations = rs.getInt("nombreParticipations");
-                return new participant(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription, nombreParticipations);
+                return new participant(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription, rs.getInt("nombreParticipations"));
             }
         }
         return null;

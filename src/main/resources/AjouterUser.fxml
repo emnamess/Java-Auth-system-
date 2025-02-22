@@ -2,81 +2,78 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.Hyperlink?>
 <AnchorPane prefHeight="650.0" prefWidth="855.0" style="-fx-background-color: linear-gradient(to bottom, #004369, #b1d4e0, #2e4963);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.AjouterUserController">
     <children>
-        <VBox alignment="CENTER" layoutX="238.0" layoutY="40.0" prefHeight="550.0" prefWidth="378.0" spacing="10" style="-fx-background-color: white; -fx-padding: 30; -fx-border-radius: 50; -fx-background-radius: 50; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);">
+        <VBox alignment="CENTER" layoutX="238.0" prefHeight="739.0" prefWidth="378.0" spacing="10" style="-fx-background-color: white; -fx-padding: 30; -fx-border-radius: 50; -fx-background-radius: 50; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);">
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;" text="Créer un compte" />
 
             <TextField fx:id="nomField" promptText="Nom" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-            <Label fx:id="nomErrorLabel" text="" style="-fx-text-fill: red;" />
+            <Label fx:id="nomErrorLabel" style="-fx-text-fill: red;" text="" />
 
             <TextField fx:id="prenomField" promptText="Prénom" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-            <Label fx:id="prenomErrorLabel" text="" style="-fx-text-fill: red;" />
+            <Label fx:id="prenomErrorLabel" style="-fx-text-fill: red;" text="" />
 
             <TextField fx:id="emailField" promptText="Email" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-            <Label fx:id="emailErrorLabel" text="" style="-fx-text-fill: red;" />
+            <Label fx:id="emailErrorLabel" style="-fx-text-fill: red;" text="" />
 
             <PasswordField fx:id="passwordField" promptText="Mot de passe" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-            <Label fx:id="passwordErrorLabel" text="" style="-fx-text-fill: red;" />
+            <Label fx:id="passwordErrorLabel" style="-fx-text-fill: red;" text="" />
 
             <PasswordField fx:id="confirmPasswordField" promptText="Confirmer mot de passe" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-            <Label fx:id="confirmPasswordErrorLabel" text="" style="-fx-text-fill: red;" />
+            <Label fx:id="confirmPasswordErrorLabel" style="-fx-text-fill: red;" text="" />
 
             <TextField fx:id="adresseField" promptText="Adresse" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-            <Label fx:id="adresseErrorLabel" text="" style="-fx-text-fill: red;" />
+            <Label fx:id="adresseErrorLabel" style="-fx-text-fill: red;" text="" />
 
             <TextField fx:id="telephoneField" promptText="Téléphone" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-            <Label fx:id="telephoneErrorLabel" text="" style="-fx-text-fill: red;" />
+            <Label fx:id="telephoneErrorLabel" style="-fx-text-fill: red;" text="" />
 
             <DatePicker fx:id="dobField" promptText="Date de naissance" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-            <Label fx:id="dobErrorLabel" text="" style="-fx-text-fill: red;" />
+            <Label fx:id="dobErrorLabel" style="-fx-text-fill: red;" text="" />
 
             <VBox fx:id="extraFieldsContainer" spacing="10">
                 <VBox fx:id="organisateurFields" managed="false" visible="false">
                     <Label text="Informations Organisateur" />
                     <TextField fx:id="workField" promptText="Travail" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-                    <Label fx:id="workErrorLabel" text="" style="-fx-text-fill: red;" managed="true" visible="true"/>
+                    <Label fx:id="workErrorLabel" managed="true" style="-fx-text-fill: red;" text="" visible="true" />
 
                     <TextField fx:id="workEmailField" promptText="Email Professionnel" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-                    <Label fx:id="workEmailErrorLabel" text="" style="-fx-text-fill: red;" />
+                    <Label fx:id="workEmailErrorLabel" style="-fx-text-fill: red;" text="" />
 
                 </VBox>
 
                 <VBox fx:id="partenaireFields" managed="false" visible="false">
                     <Label text="Informations Partenaire" />
                     <TextField fx:id="typeServiceField" promptText="Type de Service" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-                    <Label fx:id="typeServiceErrorLabel" text="" style="-fx-text-fill: red;" />
+                    <Label fx:id="typeServiceErrorLabel" style="-fx-text-fill: red;" text="" />
 
                     <TextField fx:id="siteWebField" promptText="Site Web" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-                    <Label fx:id="siteWebErrorLabel" text="" style="-fx-text-fill: red;" />
+                    <Label fx:id="siteWebErrorLabel" style="-fx-text-fill: red;" text="" />
 
                     <TextField fx:id="nbreContratsField" promptText="Nombre de Contrats" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-                    <Label fx:id="nbreContratsErrorLabel" text="" style="-fx-text-fill: red;" />
+                    <Label fx:id="nbreContratsErrorLabel" style="-fx-text-fill: red;" text="" />
 
                 </VBox>
 
                 <VBox fx:id="participantFields" managed="false" visible="false">
                     <Label text="Informations Participant" />
                     <TextField fx:id="nombreParticipationsField" promptText="Nombre de Participations" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
-                    <Label fx:id="nombreParticipationsErrorLabel" text="" style="-fx-text-fill: red;" />
+                    <Label fx:id="nombreParticipationsErrorLabel" style="-fx-text-fill: red;" text="" />
                 </VBox>
             </VBox>
 
-            <Button fx:id="submitButton" onAction="#handleSignUp"
-                    disable="true"
-                    style="-fx-background-color: #4facfe; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;"
-                    text="S'inscrire" />
+            <Button fx:id="submitButton" disable="true" onAction="#handleSignUp" style="-fx-background-color: #4facfe; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="S'inscrire" />
             <HBox spacing="5">
-                <Label text="Vous avez déja un compte ?" style="-fx-text-fill: #333;" />
-                <Hyperlink fx:id="LoginLink" text="Se connecter" onAction="#handleLogin" style="-fx-text-fill: #2575fc; -fx-font-weight: bold;" />
+                <Label style="-fx-text-fill: #333;" text="Vous avez déja un compte ?" />
+                <Hyperlink fx:id="LoginLink" onAction="#handleLogin" style="-fx-text-fill: #2575fc; -fx-font-weight: bold;" text="Se connecter" />
             </HBox>
         </VBox>
     </children>

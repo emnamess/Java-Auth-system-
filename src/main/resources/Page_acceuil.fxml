@@ -45,5 +45,10 @@
             <Font size="31.0" />
          </font>
       </Text>
+      <Button layoutX="633.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-color: #004369; -fx-background-radius: 30;" text="Se connecter" textFill="WHITE" onAction="#handleloadlogin" >
+         <font>
+            <Font size="21.0" />
+         </font>
+      </Button>
     </children>
 </AnchorPane>

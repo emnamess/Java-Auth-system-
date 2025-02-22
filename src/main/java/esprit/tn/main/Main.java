@@ -12,8 +12,8 @@ public class Main {
         DatabaseConnection.getInstance();
         userService userservice = new userService();
         authentificationService authService = new authentificationService();
-        String email = "emna@example.com";
-        String password = "password123";
+        String email = "aminekchok06@gmail.com";
+        String password = "Amine123";
 
         user loggedInUser = authService.login(email, password);
         System.out.println("✅ Authentication successful!");
