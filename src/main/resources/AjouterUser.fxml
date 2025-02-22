@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.gluonhq.charm.glisten.control.Icon?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Hyperlink?>
@@ -76,5 +77,6 @@
                 <Hyperlink fx:id="LoginLink" onAction="#handleLogin" style="-fx-text-fill: #2575fc; -fx-font-weight: bold;" text="Se connecter" />
             </HBox>
         </VBox>
+      <Icon content="ARROW_BACK" layoutX="25.0" layoutY="14.0" style="-fx-background-color: white;" />
     </children>
 </AnchorPane>

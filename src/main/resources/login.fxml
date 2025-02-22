@@ -33,7 +33,9 @@
             <PasswordField fx:id="passwordField" promptText="Password" style="-fx-pref-height: 40px; -fx-background-radius: 5px;" />
 
             <!-- Login Button -->
-            <Button onAction="#handleLogin" style="-fx-background-color: #2575fc; -fx-text-fill: white;            -fx-font-size: 14px; -fx-pref-height: 40px;            -fx-background-radius: 5px; -fx-font-weight: bold;" text="Login" />
+            <Button onAction="#handleLogin" style="-fx-background-color: #2575fc; -fx-text-fill: white;
+             -fx-font-size: 14px; -fx-pref-height: 40px;
+            -fx-background-radius: 5px; -fx-font-weight: bold;" text="Login" />
 
             <!-- Error Message -->
             <Label fx:id="messageLabel" style="-fx-font-size: 12px;" textFill="red" />

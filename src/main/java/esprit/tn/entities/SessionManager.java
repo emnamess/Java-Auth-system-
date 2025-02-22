@@ -8,7 +8,13 @@ public class SessionManager {
 
     public static void setToken(String newToken) {
         token = newToken;
-        saveTokenToFile(newToken);
+
+        // Prevent writing null tokens to the file
+        if (newToken == null || newToken.isEmpty()) {
+            deleteTokenFile();
+        } else {
+            saveTokenToFile(newToken);
+        }
     }
 
     public static String getToken() {
@@ -43,6 +49,7 @@ public class SessionManager {
         File file = new File(TOKEN_FILE);
         if (file.exists()) {
             file.delete();
+            System.out.println("🗑 Token file deleted.");
         }
     }
 }

@@ -167,31 +167,5 @@ public class LoginController {
             e.printStackTrace();
         }
     }
-//    private void handleLogout() {
-//        SessionManager.setToken(null);
-//        deleteTokenFile();
-//        loadLoginScreen();
-//    }
-
-    // Delete stored token
-//    private void deleteTokenFile() {
-//        File file = new File("auth_token.txt");
-//        if (file.exists()) {
-//            file.delete();
-//        }
-//    }
-//    private void loadLoginScreen() {
-//        try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
-//            Parent root = loader.load();
-//            Stage stage = (Stage) logoutButton.getScene().getWindow();
-//            Scene scene = new Scene(root);
-//            stage.setScene(scene);
-//            stage.show();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            System.out.println("❌ Error loading the login screen.");
-//        }
-//    }
 
 }
