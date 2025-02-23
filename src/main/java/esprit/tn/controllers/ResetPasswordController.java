@@ -1,7 +1,5 @@
 package esprit.tn.controllers;
 
-
-
 import esprit.tn.services.authentificationService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,11 +26,25 @@ public class ResetPasswordController {
         String newPassword = newPasswordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
+        // Check if email is set
+        if (userEmail == null || userEmail.isEmpty()) {
+            messageLabel.setText("⚠ No user email found. Try again.");
+            return;
+        }
+
+        // Check if fields are empty
         if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
             messageLabel.setText("⚠ Password fields cannot be empty.");
             return;
         }
 
+        // Validate password strength
+        if (!isValidPassword(newPassword)) {
+            messageLabel.setText("⚠ Password must be at least 8 chars, with a number & symbol.");
+            return;
+        }
+
+        // Check if passwords match
         if (!newPassword.equals(confirmPassword)) {
             messageLabel.setText("❌ Passwords do not match!");
             return;
@@ -46,7 +58,16 @@ public class ResetPasswordController {
             closeWindow();
         } else {
             messageLabel.setText("❌ Failed to reset password. Try again.");
+            newPasswordField.clear();
+            confirmPasswordField.clear();
         }
+    }
+
+    // Password validation method (at least 8 characters, one number, one special character)
+    private boolean isValidPassword(String password) {
+        return password.length() >= 8 &&
+                password.matches(".*\\d.*") && // At least one number
+                password.matches(".*[!@#$%^&*()].*"); // At least one special character
     }
 
     private void closeWindow() {

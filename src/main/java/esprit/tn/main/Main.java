@@ -12,15 +12,19 @@ public class Main {
         DatabaseConnection.getInstance();
         userService userservice = new userService();
         authentificationService authService = new authentificationService();
-        String email = "aminekchok06@gmail.com";
-        String password = "Amine123";
 
-        user loggedInUser = authService.login(email, password);
-        System.out.println("✅ Authentication successful!");
-        System.out.println("🔑 JWT Token: " + loggedInUser.getJwtToken()); // Get the token from the user object
+        String userEmail = "Emna.MESSAOUDI@esprit.tn"; // Change to an existing user's email
+        String newPassword = "NewSecurePass@123";
 
-    }
+        System.out.println("[DEBUG] Attempting to update password for: " + userEmail);
 
+        boolean isUpdated = authService.updatePassword(userEmail, newPassword);
+
+        if (isUpdated) {
+            System.out.println("✅ Password updated successfully for " + userEmail);
+        } else {
+            System.out.println("❌ Failed to update password.");
+        }
 
         //user participant = new participant("Alice", "Durand", "alice@example.com", "password123",LocalDate.of(1995, 5, 20), "123 Rue des Fleurs", 123456789, LocalDate.now(),50);
         //user partenaire = new partenaire("emna", "messaoudi", "emna@example.com", "password123",LocalDate.of(1995, 5, 20), "123 Rue des zombies", 123456789, LocalDate.now(),"service1","www.service.com",44);
@@ -46,4 +50,4 @@ public class Main {
         //userservice.supprimer(2);
         //userservice.getall();
         //userservice.getOne(5);
-    }
+    }}

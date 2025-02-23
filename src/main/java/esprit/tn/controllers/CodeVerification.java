@@ -36,12 +36,25 @@ public class CodeVerification {
             return;
         }
 
-        // Check if the entered code matches the stored code
-        String storedCode = authService.getStoredVerificationCode(userEmail);
-        if (storedCode == null) {
-            errorLabel.setText("❌ No verification code found. Request a new one.");
+        // Check if userEmail is null or empty
+        if (userEmail == null || userEmail.isEmpty()) {
+            errorLabel.setText("❌ Error: No email associated with this request.");
+            System.out.println("[ERROR] userEmail is null or empty.");
             return;
         }
+
+        System.out.println("[INFO] Checking stored code for email: " + userEmail);
+
+        // Fetch stored code
+        String storedCode = authService.getStoredVerificationCode(userEmail);
+
+        if (storedCode == null) {
+            errorLabel.setText("❌ No verification code found. Request a new one.");
+            System.out.println("[ERROR] No verification code found for email: " + userEmail);
+            return;
+        }
+
+        System.out.println("[INFO] Entered code: " + enteredCode + ", Stored code: " + storedCode);
 
         if (enteredCode.equals(storedCode)) {
             errorLabel.setText("✅ Code verified! Redirecting...");
@@ -51,8 +64,10 @@ public class CodeVerification {
             openResetPasswordScreen(event);
         } else {
             errorLabel.setText("❌ Invalid code. Please try again.");
+            System.out.println("[ERROR] Incorrect verification code entered.");
         }
     }
+
 
     private void openResetPasswordScreen(ActionEvent event) {
         try {

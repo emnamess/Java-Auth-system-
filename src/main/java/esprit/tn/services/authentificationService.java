@@ -257,7 +257,7 @@ public class authentificationService {
         return false;
     }
     public String getStoredVerificationCode(String email) {
-        String query = "SELECT verification_code FROM users WHERE email = ? AND code_expiry > NOW()";
+        String query = "SELECT verification_code FROM user WHERE email = ? AND verification_expiry > NOW()";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
@@ -271,13 +271,20 @@ public class authentificationService {
     }
 
     public boolean updatePassword(String email, String newPassword) {
-        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt()); // Hash the new password
+        System.out.println("[DEBUG] Updating password for: " + email);
 
-        String query = "UPDATE user SET mot_de_passe = ? WHERE email = ?";
-        try (PreparedStatement stmt = cnx.prepareStatement(query)) {
-            stmt.setString(1, hashedPassword); // ✅ Store the hashed password
-            stmt.setString(2, email);
-            return stmt.executeUpdate() > 0;
+        try {
+            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt()); // Hash the new password
+            String query = "UPDATE user SET mot_de_passe = ? WHERE email = ?";
+
+            PreparedStatement pstmt = cnx.prepareStatement(query);
+            pstmt.setString(1, hashedPassword);
+            pstmt.setString(2, email);
+
+            int rowsUpdated = pstmt.executeUpdate();
+            System.out.println("[DEBUG] Rows updated: " + rowsUpdated);
+
+            return rowsUpdated > 0; // Returns true if at least one row is updated
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

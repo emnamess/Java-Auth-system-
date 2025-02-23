@@ -204,22 +204,29 @@ public class LoginController {
             messageLabel.setText("✅ Verification code sent! Check your email.");
             messageLabel.setStyle("-fx-text-fill: green;");
 
-            // Redirect to the verification code input screen
-            openVerificationScreen();
+            // Redirect to verification screen and pass email
+            openVerificationScreen(email);
         } else {
             messageLabel.setText("❌ Failed to send email. Try again.");
             messageLabel.setStyle("-fx-text-fill: red;");
         }
     }
-    private void openVerificationScreen() {
+    private void openVerificationScreen(String email) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/CodeVerification.fxml"));
             Parent root = loader.load();
+
+            // Get controller of the next screen
+            CodeVerification controller = loader.getController();
+            controller.setUserEmail(email); // Pass the email
+
+            // Open verification screen
             Stage stage = (Stage) usernameField.getScene().getWindow();
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
         } catch (IOException e) {
+            System.out.println("[ERROR] Failed to open Code Verification screen: " + e.getMessage());
             e.printStackTrace();
         }
     }
