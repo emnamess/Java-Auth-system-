@@ -15,8 +15,10 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +34,19 @@ public class authentificationService {
     public authentificationService() {
         cnx = DatabaseConnection.getInstance().getCnx();
     }
-
+    public boolean emailExists(String email) {
+        String query = "SELECT COUNT(*) FROM user WHERE email = ?";
+        try (PreparedStatement stmt = cnx.prepareStatement(query)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Returns false if no user is found
+    }
     public user login(String email, String password) throws Exception {
         String query = "SELECT * FROM user WHERE email = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
@@ -136,25 +150,35 @@ public class authentificationService {
         }
     }
 
-    private organisateur getOrganisateur(int Id_user, String nom, String prenom, String email, String password, LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription) throws Exception {
+    private organisateur getOrganisateur(int Id_user, String nom, String prenom, String email, String password,
+                                         LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription) throws Exception {
         String query = "SELECT workField, workEmail FROM organisateur WHERE Id_user = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setInt(1, Id_user);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new organisateur(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription, rs.getString("workField"), rs.getString("workEmail"));
+                organisateur o = new organisateur(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription,
+                        rs.getString("workField"), rs.getString("workEmail"));
+                o.setId_user(Id_user); // ✅ Ensure the user ID is explicitly set
+                System.out.println("✅ Assigned user ID in getOrganisateur: " + o.getId_user()); // Debugging
+                return o;
             }
         }
         return null;
     }
 
-    private partenaire getPartenaire(int Id_user, String nom, String prenom, String email, String password, LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription) throws Exception {
+    private partenaire getPartenaire(int Id_user, String nom, String prenom, String email, String password,
+                                     LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription) throws Exception {
         String query = "SELECT typeService, siteWeb, nbreContrats FROM partenaire WHERE Id_user = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setInt(1, Id_user);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new partenaire(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription, rs.getString("typeService"), rs.getString("siteWeb"), rs.getInt("nbreContrats"));
+                partenaire p = new partenaire(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription,
+                        rs.getString("typeService"), rs.getString("siteWeb"), rs.getInt("nbreContrats"));
+                p.setId_user(Id_user); // ✅ Ensure the user ID is explicitly set
+                System.out.println("✅ Assigned user ID in getPartenaire: " + p.getId_user()); // Debugging
+                return p;
             }
         }
         return null;
@@ -182,8 +206,6 @@ public class authentificationService {
         return null;
     }
 
-
-
     public int extractUserIdFromToken(String token) {
         try {
             DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(SECRET_KEY))
@@ -193,6 +215,72 @@ public class authentificationService {
         } catch (Exception e) {
             System.err.println("Error extracting userId from token: " + e.getMessage());
             return -1;
+        }
+    }
+    public void storeVerificationCode(String email, String verificationCode) {
+        String query = "UPDATE user SET verification_code = ?, verification_expiry = DATE_ADD(NOW(), INTERVAL 10 MINUTE) WHERE email = ?";
+
+        try (
+             PreparedStatement statement = cnx.prepareStatement(query)) {
+
+            statement.setString(1, verificationCode);
+            statement.setString(2, email);
+            int rowsUpdated = statement.executeUpdate();
+
+            if (rowsUpdated == 0) {
+                System.out.println("❌ No user found with this email.");
+            } else {
+                System.out.println("✅ Verification code stored successfully.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public boolean verifyCode(String email, String enteredCode) {
+        String query = "SELECT verification_code, verification_expiry FROM user WHERE email = ?";
+        try (
+             PreparedStatement pstmt = cnx.prepareStatement(query)) {
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                String storedCode = rs.getString("verification_code");
+                LocalDateTime expiry = rs.getTimestamp("verification_expiry").toLocalDateTime();
+
+                if (LocalDateTime.now().isBefore(expiry) && storedCode.equals(enteredCode)) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public String getStoredVerificationCode(String email) {
+        String query = "SELECT verification_code FROM users WHERE email = ? AND code_expiry > NOW()";
+        try (PreparedStatement stmt = cnx.prepareStatement(query)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("verification_code");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean updatePassword(String email, String newPassword) {
+        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt()); // Hash the new password
+
+        String query = "UPDATE user SET mot_de_passe = ? WHERE email = ?";
+        try (PreparedStatement stmt = cnx.prepareStatement(query)) {
+            stmt.setString(1, hashedPassword); // ✅ Store the hashed password
+            stmt.setString(2, email);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

@@ -1,6 +1,7 @@
 package esprit.tn.entities;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class user {
     protected int id_user;
@@ -13,6 +14,8 @@ public class user {
     protected int telephone;
     protected LocalDate  dateInscription;
     private String jwtToken;
+    private String verificationCode;
+    private LocalDateTime verificationExpiry;
 
     public user( String nom, String prenom, String email, String motDePasse, LocalDate  dateNaissance, String adresse, int telephone, LocalDate  dateInscription) {
         this.nom = nom;
@@ -106,4 +109,10 @@ public class user {
     public void setJwtToken(String jwtToken) {
         this.jwtToken = jwtToken;
     }
+    public String getVerificationCode() { return verificationCode; }
+    public void setVerificationCode(String verificationCode) { this.verificationCode = verificationCode; }
+
+    public LocalDateTime getVerificationExpiry() { return verificationExpiry; }
+    public void setVerificationExpiry(LocalDateTime verificationExpiry) { this.verificationExpiry = verificationExpiry; }
 }
+
