@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class CodeVerificationController {
+public class CodeVerification {
 
     @FXML private TextField codeField;
     @FXML private Label errorLabel;

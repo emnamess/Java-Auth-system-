@@ -13,10 +13,9 @@
     <children>
         <VBox alignment="CENTER" layoutX="109.0" prefHeight="480.0" prefWidth="300.0" spacing="15.0" style="-fx-background-color: white;                      -fx-padding: 20px;                      -fx-border-radius: 10px;                      -fx-background-radius: 10px;                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);">
 
-            <!-- ImageView for an Icon -->
             <ImageView fitHeight="80.0" fitWidth="80.0">
                 <image>
-                    <Image url="@/images/verification.png" />
+                    <Image url="@/images/img_1.png" />
                 </image>
             </ImageView>
          <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
@@ -25,21 +24,17 @@
             </image>
          </ImageView>
 
-            <!-- Title Label -->
             <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Verify Your Code" />
 
-            <!-- TextField for Code Input -->
             <TextField fx:id="codeField" maxWidth="200.0" promptText="Enter 6-digit code" style="-fx-font-size: 14px;                               -fx-padding: 8px;                               -fx-border-radius: 5px;                               -fx-background-radius: 5px;                               -fx-border-color: #ccc;" />
 
-            <!-- Verify Button -->
             <Button fx:id="verifyButton" style="-fx-background-color: #4CAF50;
-             -fx-text-fill: white;
-             -fx-font-size: 14px;
-             -fx-padding: 10px;
-             -fx-background-radius: 5px;-fx-border-radius: 5px;" text="Verify Code" onAction="#handleVerifyCode"/>
-             />
+ -fx-text-fill: white;
+ -fx-font-size: 14px;
+ -fx-padding: 10px;
+ -fx-background-radius: 5px;-fx-border-radius: 5px;" text="Verify Code" onAction="#handleVerifyCode"/>
 
-            <!-- Error Label -->
+
             <Label fx:id="errorLabel" style="-fx-font-size: 12px;" textFill="red" />
 
         </VBox>
