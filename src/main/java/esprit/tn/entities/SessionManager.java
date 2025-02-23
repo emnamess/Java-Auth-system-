@@ -1,5 +1,7 @@
 package esprit.tn.entities;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import java.io.*;
 
 public class SessionManager {
@@ -8,8 +10,6 @@ public class SessionManager {
 
     public static void setToken(String newToken) {
         token = newToken;
-
-        // Prevent writing null tokens to the file
         if (newToken == null || newToken.isEmpty()) {
             deleteTokenFile();
         } else {
@@ -21,8 +21,29 @@ public class SessionManager {
         if (token == null) {
             token = loadTokenFromFile();
         }
+        System.out.println("🔍 Retrieved Token: " + token); // Debug print
         return token;
     }
+
+
+    public static Integer getUserIdFromToken() {
+        String jwt = getToken();
+        if (jwt == null || jwt.isEmpty()) {
+            System.out.println("⚠ No JWT token found.");
+            return null;
+        }
+
+        try {
+            DecodedJWT decodedJWT = JWT.decode(jwt);
+            Integer userId = decodedJWT.getClaim("userId").asInt();
+            System.out.println("✅ Extracted userId: " + userId); // Debug print
+            return userId;
+        } catch (Exception e) {
+            System.out.println("❌ Error decoding JWT: " + e.getMessage());
+            return null;
+        }
+    }
+
 
     public static void clearToken() {
         token = null;

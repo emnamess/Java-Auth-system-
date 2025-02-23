@@ -138,7 +138,6 @@ public class userService implements Iservice<user> {
                     stmAdmin.setInt(2, user.getId_user());
                     stmAdmin.executeUpdate();
                 }
-
                 System.out.println("Utilisateur mis à jour avec succès !");
             } else {
                 System.out.println("Aucun utilisateur trouvé avec cet ID.");
