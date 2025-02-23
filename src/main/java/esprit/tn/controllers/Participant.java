@@ -1,5 +1,6 @@
 package esprit.tn.controllers;
 
+import esprit.tn.entities.NavigationManager;
 import esprit.tn.entities.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -55,20 +56,28 @@ public class Participant {
             System.out.println("❌ Error loading the login screen.");
         }
     }
-    public void gotomodifyprofile(){
+    public void gotomodifyprofile() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/Modifier_Profil.fxml"));
             Parent root = loader.load();
 
-            // Get the current stage
+            // ✅ Get the current scene
             Stage stage = (Stage) logoutButton.getScene().getWindow();
+            Scene currentScene = logoutButton.getScene();
+
+            // ✅ Store the current scene before switching
+            NavigationManager.pushScene(currentScene);
+
+            // ✅ Switch to the new scene
             Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.show();
+
             System.out.println("✅ Redirected to modifier page.");
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("❌ Error loading the login screen.");
+            System.out.println("❌ Error loading the modifier profile page.");
         }
     }
+
 }

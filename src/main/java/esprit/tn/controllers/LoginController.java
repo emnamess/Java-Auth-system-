@@ -168,4 +168,6 @@ public class LoginController {
         }
     }
 
+    public void handleforgotpassword(ActionEvent actionEvent) {
+    }
 }

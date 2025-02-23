@@ -2,18 +2,21 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="650.0" prefWidth="855.0" style="-fx-background-color: linear-gradient(to bottom, #004369, #b1d4e0, #2e4963);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.ModifierProfil">
     <children>
-        <Label fx:id="messageLabel" layoutX="100" layoutY="50" text="Welcome!" />
 
         <VBox alignment="CENTER" layoutX="238.0" prefHeight="739.0" prefWidth="378.0" spacing="10" style="-fx-background-color: white; -fx-padding: 30; -fx-border-radius: 50; -fx-background-radius: 50; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);">
+           <Label fx:id="messageLabel" text="Welcome!" textFill="#3ec765">
+            <font>
+               <Font size="22.0" />
+            </font>
+         </Label>
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;" text="Modifier Profil" />
 
             <TextField fx:id="nomField" promptText="Nom" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
@@ -63,10 +66,10 @@
                 </VBox>
             </VBox>
 
-            <Button fx:id="submitButton" disable="true" onAction="#handleModifierProfile" style="-fx-background-color: #4facfe; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="Modifier" />
+            <Button fx:id="submitButton" onAction="#handleModifierProfile" style="-fx-background-color: #4facfe; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="Modifier" />
 
         </VBox>
-        <Label text="←" layoutX="25.0" layoutY="14.0" style="-fx-font-size: 50px; -fx-text-fill: white;"/>
-<!--               onMouseClicked="#goBack" -->
+        <Button text="←" onAction="#handleGoBack" />
+
     </children>
 </AnchorPane>
