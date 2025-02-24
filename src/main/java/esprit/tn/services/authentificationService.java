@@ -214,7 +214,7 @@ public class authentificationService {
                            LocalDate dateNaissance, String adresse, int telephone,
                            LocalDate dateInscription) throws Exception {
 
-        String query = "SELECT createdAt FROM admins WHERE Id_user = ?";
+        String query = "SELECT createdAt FROM admin WHERE Id_user = ?";
 
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setInt(1, Id_user);

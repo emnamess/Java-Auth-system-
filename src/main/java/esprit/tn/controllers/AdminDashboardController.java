@@ -65,12 +65,8 @@ public class AdminDashboardController {
             user foundUser = userService.getOne(id);
             filteredUsers = (foundUser != null) ? List.of(foundUser) : List.of();
         } catch (NumberFormatException e) {
-            // If not a number, filter by name, email, etc.
-            filteredUsers = userList.stream()
-                    .filter(user -> user.getNom().toLowerCase().contains(searchTerm.toLowerCase()) ||
-                            user.getPrenom().toLowerCase().contains(searchTerm.toLowerCase()) ||
-                            user.getEmail().toLowerCase().contains(searchTerm.toLowerCase()))
-                    .collect(Collectors.toList());
+            // If input is not an ID, use getByName to fetch from the database
+            filteredUsers = userService.getByName(searchTerm);
         }
 
         usersTable.setItems(FXCollections.observableArrayList(filteredUsers));

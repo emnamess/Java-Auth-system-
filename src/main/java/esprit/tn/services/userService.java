@@ -347,7 +347,36 @@ public class userService implements Iservice<user> {
 
         return u;
     }
+    public List<user> getByName(String name) {
+        String query = "SELECT * FROM user WHERE nom = ?";
+        List<user> users = new ArrayList<>();
 
+        try {
+            PreparedStatement stmt = cnx.prepareStatement(query);
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) { // Loop through all matching users
+                int idUser = rs.getInt("id_user");
+                String prenom = rs.getString("prenom");
+                String email = rs.getString("email");
+                String motDePasse = rs.getString("mot_de_passe");
+                Date dateNaiss = rs.getDate("date_naiss");
+                String adresse = rs.getString("adresse");
+                int telephone = rs.getInt("telephone");
+                Date dateInscription = rs.getDate("date_inscription");
+
+                user u = new user(name, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate());
+                u.setId_user(idUser);
+                users.add(u); // Add user to the list
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la récupération des utilisateurs : " + e.getMessage());
+        }
+
+        return users; // Return the full list of users
+    }
 
 
 }

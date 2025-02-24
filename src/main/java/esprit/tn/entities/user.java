@@ -95,6 +95,24 @@ public class user {
         this.telephone = telephone;
     }
 
+    @Override
+    public String toString() {
+        return "user{" +
+                "id_user=" + id_user +
+                ", nom='" + nom + '\'' +
+                ", prenom='" + prenom + '\'' +
+                ", email='" + email + '\'' +
+                ", motDePasse='" + motDePasse + '\'' +
+                ", dateNaissance=" + dateNaissance +
+                ", adresse='" + adresse + '\'' +
+                ", telephone=" + telephone +
+                ", dateInscription=" + dateInscription +
+                ", jwtToken='" + jwtToken + '\'' +
+                ", verificationCode='" + verificationCode + '\'' +
+                ", verificationExpiry=" + verificationExpiry +
+                '}';
+    }
+
     public LocalDate  getDateInscription() {
         return dateInscription;
     }
