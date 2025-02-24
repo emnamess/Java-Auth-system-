@@ -8,10 +8,10 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="480.0" prefWidth="519.0" style="-fx-background-color: linear-gradient(to bottom, #004369, #b1d4e0, #2e4963);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.CodeVerification">
+<AnchorPane prefHeight="650.0" prefWidth="855.0" style="-fx-background-color: linear-gradient(to bottom, #004369, #b1d4e0, #2e4963);" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.CodeVerification">
 
     <children>
-        <VBox alignment="CENTER" layoutX="109.0" prefHeight="480.0" prefWidth="300.0" spacing="15.0" style="-fx-background-color: white;                      -fx-padding: 20px;                      -fx-border-radius: 10px;                      -fx-background-radius: 10px;                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);">
+        <VBox alignment="CENTER" layoutX="261.0" layoutY="75.0" prefHeight="480.0" prefWidth="300.0" spacing="15.0" style="-fx-background-color: white;                      -fx-padding: 20px;                      -fx-border-radius: 10px;                      -fx-background-radius: 10px;                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);">
 
             <ImageView fitHeight="80.0" fitWidth="80.0">
                 <image>
@@ -28,11 +28,7 @@
 
             <TextField fx:id="codeField" maxWidth="200.0" promptText="Enter 6-digit code" style="-fx-font-size: 14px;                               -fx-padding: 8px;                               -fx-border-radius: 5px;                               -fx-background-radius: 5px;                               -fx-border-color: #ccc;" />
 
-            <Button fx:id="verifyButton" style="-fx-background-color: #4CAF50;
- -fx-text-fill: white;
- -fx-font-size: 14px;
- -fx-padding: 10px;
- -fx-background-radius: 5px;-fx-border-radius: 5px;" text="Verify Code" onAction="#handleVerifyCode"/>
+            <Button fx:id="verifyButton" onAction="#handleVerifyCode" style="-fx-background-color: #4CAF50;  -fx-text-fill: white;  -fx-font-size: 14px;  -fx-padding: 10px;  -fx-background-radius: 5px;-fx-border-radius: 5px;" text="Verify Code" />
 
 
             <Label fx:id="errorLabel" style="-fx-font-size: 12px;" textFill="red" />

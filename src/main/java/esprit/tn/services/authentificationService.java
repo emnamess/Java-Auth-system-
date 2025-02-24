@@ -2,10 +2,7 @@ package esprit.tn.services;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import esprit.tn.entities.user;
-import esprit.tn.entities.organisateur;
-import esprit.tn.entities.partenaire;
-import esprit.tn.entities.participant;
+import esprit.tn.entities.*;
 import esprit.tn.main.DatabaseConnection;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -28,6 +25,8 @@ public class authentificationService {
     private static final String TABLE_ORGANISATEUR = "organisateur";
     private static final String TABLE_PARTENAIRE = "partenaire";
     private static final String TABLE_PARTICIPANT = "participants";
+    private static final String TABLE_ADMIN = "admin";
+
 
     Connection cnx;
 
@@ -85,6 +84,9 @@ public class authentificationService {
                     } else if (isParticipant(id)) {
                         userInstance = getParticipant(id, nom, prenom, email, storedHashedPassword, dateNaissance, adresse, telephone, dateInscription);
                         userType = "participant";
+                    }else if (isAdmin(id)) {
+                        userInstance = getAdmin(id, nom, prenom, email, storedHashedPassword, dateNaissance, adresse, telephone, dateInscription);
+                        userType = "admin";
                     }
 
                     if (userInstance != null) {
@@ -139,6 +141,9 @@ public class authentificationService {
 
     private boolean isParticipant(int Id_user) throws Exception {
         return checkUserType(Id_user, TABLE_PARTICIPANT);
+    }
+    private boolean isAdmin(int Id_user) throws Exception {
+        return checkUserType(Id_user, TABLE_ADMIN);
     }
 
     private boolean checkUserType(int Id_user, String tableName) throws Exception {
@@ -205,6 +210,38 @@ public class authentificationService {
         }
         return null;
     }
+    private admin getAdmin(int Id_user, String nom, String prenom, String email, String password,
+                           LocalDate dateNaissance, String adresse, int telephone,
+                           LocalDate dateInscription) throws Exception {
+
+        String query = "SELECT createdAt FROM admins WHERE Id_user = ?";
+
+        try (PreparedStatement stmt = cnx.prepareStatement(query)) {
+            stmt.setInt(1, Id_user);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                // Convert SQL Date to LocalDate
+                LocalDate createdAt = rs.getDate("createdAt").toLocalDate();
+
+                // ✅ Create an admin instance
+                admin adminUser = new admin(nom, prenom, email, password, dateNaissance, adresse,
+                        telephone, dateInscription, createdAt);
+
+                // ✅ Explicitly assign the user ID
+                adminUser.setId_user(Id_user);
+
+                // DEBUG: Verify the ID assignment
+                System.out.println("✅ Assigned user ID in getAdmin: " + adminUser.getId_user());
+
+                return adminUser;
+            }
+        }
+
+        return null; // No admin found
+    }
+
+
 
     public int extractUserIdFromToken(String token) {
         try {

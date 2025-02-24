@@ -66,8 +66,7 @@ public class ResetPasswordController {
     // Password validation method (at least 8 characters, one number, one special character)
     private boolean isValidPassword(String password) {
         return password.length() >= 8 &&
-                password.matches(".*\\d.*") && // At least one number
-                password.matches(".*[!@#$%^&*()].*"); // At least one special character
+                password.matches(".*\\d.*"); // At least one number
     }
 
     private void closeWindow() {

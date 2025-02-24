@@ -11,14 +11,14 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="611.0" prefWidth="701.0" style="-fx-background-color: linear-gradient(to bottom, #004369, #b1d4e0, #2e4963);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.LoginController">
+<AnchorPane prefHeight="650.0" prefWidth="855.0" style="-fx-background-color: linear-gradient(to bottom, #004369, #b1d4e0, #2e4963);" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.LoginController">
 
     <children>
         <!-- Centered VBox for Login Form -->
-        <VBox alignment="CENTER" layoutX="116.0" layoutY="11.0" prefHeight="588.0" prefWidth="466.0" spacing="15" style="-fx-background-color: white;                                      -fx-padding: 20px;                                      -fx-background-radius: 10px;                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);">
+        <VBox alignment="CENTER" layoutX="186.0" layoutY="-2.0" prefHeight="650.0" prefWidth="466.0" spacing="15" style="-fx-background-color: white;                                      -fx-padding: 20px;                                      -fx-background-radius: 10px;                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);">
 
             <!-- Logo Image -->
-            <ImageView fitHeight="144.0" fitWidth="193.0">
+            <ImageView fitHeight="166.0" fitWidth="226.0">
                 <image>
                     <Image url="@images/logo.jpg" />
                 </image>

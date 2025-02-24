@@ -9,46 +9,46 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="587.0" prefWidth="795.0" style="-fx-background-color: linear-gradient(to bottom, #004369, #b1d4e0, #2e4963);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.PageAcceuilController">
+<AnchorPane prefHeight="650.0" prefWidth="855.0" style="-fx-background-color: linear-gradient(to bottom, #004369, #b1d4e0, #2e4963);" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.PageAcceuilController">
     <children>
 
         <!-- Selection Buttons with Images -->
         <HBox alignment="CENTER" layoutX="49.0" layoutY="285.0" spacing="30">
-            <VBox alignment="CENTER" spacing="10">
-                <ImageView fitHeight="100" fitWidth="100" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@images/office-man.png" />
-               </image></ImageView> <!-- Add Partner image -->
-                <Button fx:id="partenaireButton" onAction="#handlePartenaireSelection" style="-fx-background-color: #2e4963; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="Vous êtes un Partenaire" />
-            </VBox>
-            <VBox alignment="CENTER" spacing="10">
-                <ImageView fitHeight="100" fitWidth="100" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@images/teamwork.png" />
-               </image></ImageView> <!-- Add Participant image -->
-                <Button fx:id="participantButton" onAction="#handleParticipantSelection" style="-fx-background-color: #2e4963; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="Vous êtes un Participant" />
-            </VBox>
+            <VBox alignment="CENTER" spacing="10" />
+            <VBox alignment="CENTER" spacing="10" />
             <VBox alignment="CENTER" spacing="10" />
         </HBox>
-          <ImageView fitHeight="100" fitWidth="100" layoutX="575.0" layoutY="285.0" pickOnBounds="true" preserveRatio="true">
+          <ImageView fitHeight="100" fitWidth="100" layoutX="656.0" layoutY="362.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@images/teamwork.png" />
          </image></ImageView> <!-- Add Organizer image -->
-          <Button fx:id="organisateurButton" layoutX="518.0" layoutY="395.0" onAction="#handleOrganisateurSelection" style="-fx-background-color: #2e4963; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="Vous êtes un Organisateur" />
+          <Button fx:id="organisateurButton" layoutX="608.0" layoutY="501.0" onAction="#handleOrganisateurSelection" style="-fx-background-color: #2e4963; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="Vous êtes un Organisateur" />
       <ImageView fitHeight="171.0" fitWidth="149.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@images/logo.jpg" />
          </image>
       </ImageView>
-      <Text fill="WHITE" layoutX="219.0" layoutY="197.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Binevenue chez EVENCIA">
+      <Text fill="WHITE" layoutX="257.0" layoutY="250.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Binevenue chez EVENCIA">
          <font>
             <Font size="31.0" />
          </font>
       </Text>
-      <Button layoutX="633.0" layoutY="14.0" mnemonicParsing="false" style="-fx-background-color: #004369; -fx-background-radius: 30;" text="Se connecter" textFill="WHITE" onAction="#handleloadlogin" >
+      <Button layoutX="732.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleloadlogin" style="-fx-background-color: #004369; -fx-background-radius: 30;" text="Se connecter" textFill="WHITE">
          <font>
             <Font size="21.0" />
          </font>
-      </Button>
+      </Button> <!-- Add Participant image -->
+          <Button fx:id="participantButton" layoutX="328.0" layoutY="501.0" onAction="#handleParticipantSelection" style="-fx-background-color: #2e4963; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="Vous êtes un Participant" /> <!-- Add Partner image -->
+          <Button fx:id="partenaireButton" layoutX="56.0" layoutY="501.0" onAction="#handlePartenaireSelection" style="-fx-background-color: #2e4963; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="Vous êtes un Partenaire" />
+          <ImageView fitHeight="100" fitWidth="100" layoutX="113.0" layoutY="362.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@images/office-man.png" />
+         </image>
+      </ImageView>
+          <ImageView fitHeight="100" fitWidth="100" layoutX="365.0" layoutY="362.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@images/teamwork.png" />
+         </image>
+      </ImageView>
     </children>
 </AnchorPane>
