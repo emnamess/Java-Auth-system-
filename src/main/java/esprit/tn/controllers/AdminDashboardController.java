@@ -1,18 +1,22 @@
 package esprit.tn.controllers;
 
-import esprit.tn.entities.organisateur;
-import esprit.tn.entities.partenaire;
-import esprit.tn.entities.participant;
-import esprit.tn.entities.user;
+import esprit.tn.entities.*;
 import esprit.tn.services.userService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
+import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,8 @@ public class AdminDashboardController {
     @FXML private TableColumn<user, String> date_inscription;
     @FXML private TableColumn<user, Void> actionColumn; // Delete button column
     @FXML private TextField searchField;
+    @FXML
+    private Button logoutButton;
     private TableColumn<user, String> extraColumn1;
     private TableColumn<user, String> extraColumn2;
     private TableColumn<user, Integer> extraColumn3;
@@ -51,6 +57,7 @@ public class AdminDashboardController {
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             filterUsers(newValue);
         });
+        logoutButton.setOnAction(event -> handleLogout());
     }
     private void filterUsers(String searchTerm) {
         if (searchTerm.isEmpty()) {
@@ -137,4 +144,42 @@ public class AdminDashboardController {
         userList.setAll(filteredUsers);
         usersTable.setItems(userList);
     }
+
+
+
+    private void handleLogout() {
+        System.out.println("🔒 Logging out...");
+
+        // Clear the session
+        SessionManager.setToken(null);
+        deleteTokenFile();
+
+        // Load login screen
+        loadLoginScreen();
+    }
+
+    private void deleteTokenFile() {
+        File file = new File("auth_token.txt");
+        if (file.exists()) {
+            file.delete();
+            System.out.println("🗑 Token file deleted.");
+        }
+    }
+    public void loadLoginScreen() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Page_acceuil.fxml")); // Change to your login/home page
+            Parent root = loader.load();
+
+            // Get the current stage
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+            System.out.println("✅ Redirected to login page.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("❌ Error loading the login screen.");
+        }
+    }
+
 }

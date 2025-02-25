@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="esprit.tn.controllers.FaceRecognitionController"
+            prefHeight="500.0" prefWidth="700.0"
+            style="-fx-background-color: #1E1E1E;">
+
+    <!-- UI Card -->
+    <VBox layoutX="150" layoutY="60" spacing="15" style="-fx-background-color: #2A2A2A; -fx-padding: 20; -fx-background-radius: 15;">
+        <Rectangle width="350" height="250" arcHeight="20" arcWidth="20" fill="#00000033"/>
+        <ImageView fx:id="imageView" fitWidth="350" fitHeight="250"/>
+
+        <Button fx:id="captureButton" text="📷 Capture Image"
+                style="-fx-background-color: #0078D7; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10;"></Button>
+
+        <Button fx:id="recognizeButton" text="🤖 Recognize Face"
+                style="-fx-background-color: #00C853; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10;"></Button>
+
+        <Label fx:id="statusLabel" text="🔍 Status: Waiting for input..."
+               style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+    </VBox>
+
+</AnchorPane>

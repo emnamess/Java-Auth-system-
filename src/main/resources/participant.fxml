@@ -24,8 +24,15 @@
             <Image url="@images/office-man.png" />
          </image>
       </ImageView>
+      <Button fx:id="faceRecognitionButton" layoutX="230.0" layoutY="300.0" mnemonicParsing="false"
+              text="Go to Face Recognition"
+              onAction="#goToFaceRecognition"
+              style="-fx-background-color: #0078D7; -fx-text-fill: white; -fx-font-size: 16px;">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
 
-      
 
    </children>
 </AnchorPane>

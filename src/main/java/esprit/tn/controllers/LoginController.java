@@ -1,5 +1,4 @@
 package esprit.tn.controllers;
-
 import esprit.tn.entities.JwtUtils;
 import esprit.tn.entities.SessionManager;
 import esprit.tn.entities.user;
@@ -21,10 +20,15 @@ import javafx.stage.Stage;
 import javafx.scene.Parent;
 
 import java.io.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
 public class LoginController {
+    private static final String CLIENT_SECRET_FILE = "src/main/resources/client_secret.json";
+    private static final List<String> SCOPES = Collections.singletonList("email");
+    private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -34,7 +38,6 @@ public class LoginController {
 
 
     private final authentificationService authService = new authentificationService();
-
     @FXML
     private void handleLogin() {
         String email = usernameField.getText();
@@ -75,8 +78,6 @@ public class LoginController {
             messageLabel.setStyle("-fx-text-fill: red;");
         }
     }
-
-    // Store token in a local file
     private void saveTokenToFile(String token) {
         try (FileWriter writer = new FileWriter("auth_token.txt")) {
             writer.write(token);
@@ -85,8 +86,6 @@ public class LoginController {
         }
     }
     @FXML
-
-
     private void initialize() {
         usernameField.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) { // Wait until scene is attached
@@ -113,8 +112,6 @@ public class LoginController {
             }
         });
     }
-
-    // Load token from local file
     private String loadTokenFromFile() {
         File file = new File("auth_token.txt");
         if (!file.exists()) {
@@ -143,7 +140,6 @@ public class LoginController {
             e.printStackTrace();
         }
     }
-
     private user authenticate(String email, String password) {
         try {
             return authService.login(email, password); // Return the user object instead of token
@@ -152,7 +148,6 @@ public class LoginController {
             return null;
         }
     }
-
     private void loadDashboard(String fxmlFile) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/"+fxmlFile+".fxml"));
@@ -172,8 +167,6 @@ public class LoginController {
             e.printStackTrace();
         }
     }
-
-
     @FXML
     private void handleforgotpassword(ActionEvent event) {
         String email = usernameField.getText().trim();
@@ -230,10 +223,9 @@ public class LoginController {
             e.printStackTrace();
         }
     }
-
     private boolean sendVerificationEmail(String recipientEmail, String verificationCode) {
-        final String senderEmail = "messaoudiemna75@gmail.com"; // Replace with your email
-        final String senderPassword = "kpof zdho yiic byfp"; // Use an App Password
+        final String senderEmail = "messaoudiemna75@gmail.com";
+        final String senderPassword = "kpof zdho yiic byfp";
 
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
@@ -261,4 +253,8 @@ public class LoginController {
             e.printStackTrace();
             return false;
         }
-    }}
+    }
+
+
+
+}

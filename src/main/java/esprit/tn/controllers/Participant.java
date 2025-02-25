@@ -2,8 +2,10 @@ package esprit.tn.controllers;
 
 import esprit.tn.entities.NavigationManager;
 import esprit.tn.entities.SessionManager;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -80,4 +82,24 @@ public class Participant {
         }
     }
 
-}
+    public void goToFaceRecognition(ActionEvent actionEvent) {
+        try {
+            // Get current scene and save it before switching
+            Scene currentScene = ((Node) actionEvent.getSource()).getScene();
+            NavigationManager.pushScene(currentScene);
+
+            // Load FaceRecognition.fxml
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FaceRecognition.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+
+            // Switch to new scene
+            Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    }
