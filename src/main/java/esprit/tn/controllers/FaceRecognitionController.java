@@ -1,115 +1,108 @@
 package esprit.tn.controllers;
 
+import esprit.tn.entities.SessionManager;
+import esprit.tn.main.DatabaseConnection;
+import esprit.tn.services.authentificationService;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.imgcodecs.Imgcodecs;
-import java.io.ByteArrayInputStream;
-import javafx.embed.swing.SwingFXUtils;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class FaceRecognitionController {
 
     static {
         try {
-            System.load("C:\\opencv\\opencv\\build\\java\\x64\\opencv_java490.dll");
+            System.loadLibrary("opencv_java490"); // Load OpenCV
             System.out.println("✅ OpenCV loaded successfully.");
         } catch (UnsatisfiedLinkError e) {
             System.err.println("❌ Failed to load OpenCV: " + e.getMessage());
         }
     }
 
-
     @FXML
     private ImageView imageView;
+    @FXML
+    private Label statusLabel; // For user feedback
+
+    private final authentificationService authService = new authentificationService();
+    private final VideoCapture videoCapture = new VideoCapture(0); // Open webcam
+
+    private final Integer userId = SessionManager.getUserIdFromToken(); // ✅ Extract User ID from Token
 
     @FXML
-    private Button captureButton, recognizeButton;
-
-    @FXML
-    private Label statusLabel;
-
-    private VideoCapture camera;
-    private Mat frame;
-
-    @FXML
-    public void initialize() {
-        camera = new VideoCapture(0);
-        frame = new Mat();
-
-        if (!camera.isOpened()) {
-            statusLabel.setText("❌ Camera not detected!");
+    private void captureImage() {
+        if (!videoCapture.isOpened()) {
+            System.out.println("❌ Camera not opened!");
+            statusLabel.setText("❌ Camera not opened!");
             return;
         }
 
-        captureButton.setOnAction(event -> captureImage());
-        recognizeButton.setOnAction(event -> recognizeFace());
-    }
+        Mat frame = new Mat();
+        if (videoCapture.read(frame)) {
+            System.out.println("✅ Image captured!");
 
+            // ✅ Define image save path
+            String saveDir = "C:/Users/messa/Pictures/user_images/";
+            File directory = new File(saveDir);
+            if (!directory.exists()) {
+                directory.mkdirs(); // Ensure the directory exists
+            }
 
-    private void captureImage() {
-        if (camera.isOpened()) {
-            camera.read(frame);
-            String filename = "captured_face.jpg";
-            Imgcodecs.imwrite(filename, frame);
-            updateImageView(filename);
-            statusLabel.setText("📸 Face captured successfully!");
+            String imagePath = saveDir + "user_" + userId + ".png";
+
+            // ✅ Save image using OpenCV
+            if (Imgcodecs.imwrite(imagePath, frame)) {
+                System.out.println("✅ Image saved successfully: " + imagePath);
+                statusLabel.setText("✅ Image saved successfully!");
+
+                // ✅ Update ImageView with saved image
+                imageView.setImage(new Image(new File(imagePath).toURI().toString()));
+
+                // ✅ Save image path to database
+                saveImageToDatabase(imagePath, userId);
+            } else {
+                System.out.println("❌ Failed to save image!");
+                statusLabel.setText("❌ Failed to save image!");
+            }
         } else {
-            statusLabel.setText("❌ Camera not detected!");
+            System.out.println("❌ Failed to capture image (empty frame)!");
+            statusLabel.setText("❌ Failed to capture image!");
         }
     }
 
-    private void recognizeFace() {
-        statusLabel.setText("🔍 Recognizing face...");
-        try {
-            ProcessBuilder pb = new ProcessBuilder("python", "face_recognition.py", "captured_face.jpg");
-            pb.redirectErrorStream(true); // Capture errors
+    private void saveImageToDatabase(String imagePath, int userId) {
+        String query = "UPDATE user SET profile_image = ? WHERE Id_user = ?";
 
-            Process process = pb.start();
-            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
-            String output;
-            StringBuilder result = new StringBuilder();
-            while ((output = reader.readLine()) != null) {
-                result.append(output).append("\n");
+        try (Connection cnx = DatabaseConnection.getInstance().getCnx();
+             PreparedStatement pstmt = cnx.prepareStatement(query)) {
+            pstmt.setString(1, imagePath);
+            pstmt.setInt(2, userId);
+            int rowsUpdated = pstmt.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                System.out.println("✅ Image path updated in database successfully!");
+            } else {
+                System.out.println("⚠ No user found with ID: " + userId);
             }
-            process.waitFor(); // Wait for the Python script to finish
-
-            statusLabel.setText("✅ Face recognized!\n" + result.toString());
-        } catch (Exception e) {
-            statusLabel.setText("❌ Error in face recognition!");
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println("❌ Error saving image path to database: " + e.getMessage());
         }
     }
 
-
-    private void updateImageView(String filePath) {
-        try {
-            java.io.File file = new java.io.File(filePath);
-            if (!file.exists()) {
-                statusLabel.setText("❌ Image file not found!");
-                return;
-            }
-
-            BufferedImage bufferedImage = ImageIO.read(file);
-            Image image = SwingFXUtils.toFXImage(bufferedImage, null);
-            imageView.setImage(image);
-        } catch (Exception e) {
-            statusLabel.setText("❌ Error loading image!");
-            e.printStackTrace();
-        }
-    }
-
-    public void closeCamera() {
-        if (camera != null && camera.isOpened()) {
-            camera.release();
+    public void stopCamera() {
+        if (videoCapture.isOpened()) {
+            videoCapture.release();
             System.out.println("📷 Camera closed.");
         }
     }
-
 }

@@ -3,6 +3,7 @@ import esprit.tn.entities.JwtUtils;
 import esprit.tn.entities.SessionManager;
 import esprit.tn.entities.user;
 import esprit.tn.services.authentificationService;
+import esprit.tn.services.userService;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -18,6 +19,11 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.videoio.VideoCapture;
+import org.opencv.videoio.Videoio;
 
 import java.io.*;
 import java.util.Collections;
@@ -38,6 +44,7 @@ public class LoginController {
 
 
     private final authentificationService authService = new authentificationService();
+    private final userService users = new userService();
     @FXML
     private void handleLogin() {
         String email = usernameField.getText();
@@ -254,6 +261,115 @@ public class LoginController {
             return false;
         }
     }
+    @FXML
+    private void handleFaceLogin() {
+        new Thread(() -> {
+            try {
+                String imagePath = captureImage();
+                if (imagePath == null) {
+                    Platform.runLater(() -> messageLabel.setText("❌ Failed to capture image."));
+                    return;
+                }
+
+                String userEmail = sendImageToRecognition(imagePath);
+                if (userEmail != null) {
+                    user existingUser = users.getUserByEmail(userEmail);
+                    if (existingUser != null) {
+                        // 🔹 Call loginWithFace to generate a JWT token
+                        user authenticatedUser = authService.loginWithFace(existingUser.getId_user());
+
+                        if (authenticatedUser != null) {
+                            String token = authenticatedUser.getJwtToken();
+
+                            // 🔍 Debugging Logs
+                            System.out.println("🔍 User found: " + authenticatedUser.getEmail());
+                            System.out.println("🔍 JWT Token Retrieved: " + token);
+
+                            if (token == null || token.trim().isEmpty()) {
+                                Platform.runLater(() -> messageLabel.setText("❌ Failed to retrieve JWT token."));
+                                return;
+                            }
+
+                            SessionManager.setToken(token);
+                            System.out.println("🔍 Token stored in session.");
+
+                            String userType = JwtUtils.extractRole(token);
+                            Platform.runLater(() -> loadDashboard(userType));
+                        } else {
+                            Platform.runLater(() -> messageLabel.setText("❌ Failed to authenticate user."));
+                        }
+                    } else {
+                        Platform.runLater(() -> messageLabel.setText("❌ User not found in the system."));
+                    }
+                } else {
+                    Platform.runLater(() -> messageLabel.setText("❌ Face not recognized."));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> messageLabel.setText("❌ Error during face recognition login."));
+            }
+        }).start();
+    }
+
+
+
+    private String captureImage() {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        VideoCapture camera = new VideoCapture(0);
+        camera.set(Videoio.CAP_PROP_FRAME_WIDTH, 1280);
+        camera.set(Videoio.CAP_PROP_FRAME_HEIGHT, 720);
+
+        if (!camera.isOpened()) {
+            System.out.println("❌ Error: Camera not found.");
+            return null;
+        }
+
+        Mat frame = new Mat();
+        if (!camera.read(frame)) {  // Ensure the frame is captured
+            System.out.println("❌ Error: Failed to capture frame.");
+            camera.release();
+            return null;
+        }
+
+        String imagePath = "captured_face.jpg";
+        Imgcodecs.imwrite(imagePath, frame);
+        camera.release();
+        return imagePath;
+    }
+
+    private String sendImageToRecognition(String imagePath) {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("python", "C:\\Python\\face_recognition_api.py", imagePath);
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder output = new StringBuilder();
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                // ✅ Only extract the email (ignore TensorFlow logs)
+                if (line.contains("@")) {
+                    output.append(line.trim()).append("\n");
+                }
+            }
+
+            int exitCode = process.waitFor();
+            System.out.println("Python script output:\n" + output.toString());
+
+            if (exitCode != 0 || output.toString().trim().isEmpty()) {
+                System.err.println("❌ Face recognition failed. Exit code: " + exitCode);
+                return null;
+            }
+
+            return output.toString().trim();  // Extract user email from output
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
 
 
 

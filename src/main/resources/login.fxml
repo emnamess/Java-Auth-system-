@@ -45,6 +45,9 @@
             </HBox>
             <HBox spacing="5" />
              <Hyperlink fx:id="forgotpasswordLink" alignment="BOTTOM_CENTER" onAction="#handleforgotpassword" style="-fx-text-fill: #2575fc; -fx-font-weight: bold;" text="mot de passe oublié ?" textAlignment="CENTER" />
+            <Button onAction="#handleFaceLogin"
+                    text="Login with Face Recognition"
+                    style="-fx-background-color: #00b894; -fx-text-fill: white; -fx-font-size: 14px; -fx-pref-height: 40px; -fx-background-radius: 5px; -fx-font-weight: bold;"/>
 
         </VBox>
     </children>

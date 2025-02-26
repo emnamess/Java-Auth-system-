@@ -34,9 +34,16 @@ public class SessionManager {
         }
 
         try {
+            System.out.println("🔍 Decoding JWT: " + jwt); // Debug token content
             DecodedJWT decodedJWT = JWT.decode(jwt);
+
+            if (decodedJWT.getClaim("userId").isNull()) {
+                System.out.println("⚠ 'userId' claim not found in JWT.");
+                return null;
+            }
+
             Integer userId = decodedJWT.getClaim("userId").asInt();
-            System.out.println("✅ Extracted userId: " + userId); // Debug print
+            System.out.println("✅ Extracted userId: " + userId);
             return userId;
         } catch (Exception e) {
             System.out.println("❌ Error decoding JWT: " + e.getMessage());
@@ -51,12 +58,19 @@ public class SessionManager {
     }
 
     private static void saveTokenToFile(String token) {
+        if (token == null || token.trim().isEmpty()) {
+            System.err.println("❌ Token is null or empty, skipping save.");
+            return;
+        }
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(TOKEN_FILE))) {
             writer.write(token);
+            System.out.println("✅ Token successfully saved to file.");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     private static String loadTokenFromFile() {
         try (BufferedReader reader = new BufferedReader(new FileReader(TOKEN_FILE))) {

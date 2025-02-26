@@ -377,6 +377,82 @@ public class userService implements Iservice<user> {
 
         return users; // Return the full list of users
     }
+    public user getUserByEmail(String email) {
+        String reqUser = "SELECT * FROM user WHERE email = ?";
+        user u = null;
+
+        try {
+            PreparedStatement stmUser = cnx.prepareStatement(reqUser);
+            stmUser.setString(1, email);
+            ResultSet rsUser = stmUser.executeQuery();
+
+            if (rsUser.next()) {
+                int idUser = rsUser.getInt("id_user");
+                String nom = rsUser.getString("nom");
+                String prenom = rsUser.getString("prenom");
+                String motDePasse = rsUser.getString("mot_de_passe");
+                Date dateNaiss = rsUser.getDate("date_naiss");
+                String adresse = rsUser.getString("adresse");
+                int telephone = rsUser.getInt("telephone");
+                Date dateInscription = rsUser.getDate("date_inscription");
+
+                // Create a generic user object first
+                u = new user(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate());
+                u.setId_user(idUser);
+
+                // Check if user is a participant
+                String reqParticipant = "SELECT nombreParticipations FROM participants WHERE id_user = ?";
+                PreparedStatement stmParticipant = cnx.prepareStatement(reqParticipant);
+                stmParticipant.setInt(1, idUser);
+                ResultSet rsParticipant = stmParticipant.executeQuery();
+                if (rsParticipant.next()) {
+                    int nombreParticipations = rsParticipant.getInt("nombreParticipations");
+                    u = new participant(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), nombreParticipations);
+                    u.setId_user(idUser);
+                }
+
+                // Check if user is a partenaire
+                String reqPartenaire = "SELECT type_service, site_web, nbre_contacts FROM partenaire WHERE id_user = ?";
+                PreparedStatement stmPartenaire = cnx.prepareStatement(reqPartenaire);
+                stmPartenaire.setInt(1, idUser);
+                ResultSet rsPartenaire = stmPartenaire.executeQuery();
+                if (rsPartenaire.next()) {
+                    String typeService = rsPartenaire.getString("type_service");
+                    String siteWeb = rsPartenaire.getString("site_web");
+                    int nbreContrats = rsPartenaire.getInt("nbre_contacts");
+                    u = new partenaire(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), typeService, siteWeb, nbreContrats);
+                    u.setId_user(idUser);
+                }
+
+                // Check if user is an organisateur
+                String reqOrganisateur = "SELECT workField, workEmail FROM organisateur WHERE id_user = ?";
+                PreparedStatement stmOrganisateur = cnx.prepareStatement(reqOrganisateur);
+                stmOrganisateur.setInt(1, idUser);
+                ResultSet rsOrganisateur = stmOrganisateur.executeQuery();
+                if (rsOrganisateur.next()) {
+                    String workField = rsOrganisateur.getString("workField");
+                    String workEmail = rsOrganisateur.getString("workEmail");
+                    u = new organisateur(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), workField, workEmail);
+                    u.setId_user(idUser);
+                }
+
+                // Check if user is an admin
+                String reqAdmin = "SELECT createdAt FROM admin WHERE id_user = ?";
+                PreparedStatement stmAdmin = cnx.prepareStatement(reqAdmin);
+                stmAdmin.setInt(1, idUser);
+                ResultSet rsAdmin = stmAdmin.executeQuery();
+                if (rsAdmin.next()) {
+                    LocalDate createdAt = rsAdmin.getDate("createdAt").toLocalDate();
+                    u = new admin(nom, prenom, email, motDePasse, dateNaiss.toLocalDate(), adresse, telephone, dateInscription.toLocalDate(), createdAt);
+                    u.setId_user(idUser);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la récupération de l'utilisateur par email : " + e.getMessage());
+        }
+
+        return u;
+    }
 
 
 }

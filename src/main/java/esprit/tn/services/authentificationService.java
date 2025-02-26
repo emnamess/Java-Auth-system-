@@ -6,9 +6,14 @@ import esprit.tn.entities.*;
 import esprit.tn.main.DatabaseConnection;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.IOException;
 import org.mindrot.jbcrypt.BCrypt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -174,13 +179,13 @@ public class authentificationService {
 
     private partenaire getPartenaire(int Id_user, String nom, String prenom, String email, String password,
                                      LocalDate dateNaissance, String adresse, int telephone, LocalDate dateInscription) throws Exception {
-        String query = "SELECT typeService, siteWeb, nbreContrats FROM partenaire WHERE Id_user = ?";
+        String query = "SELECT type_Service, site_Web, nbre_contacts FROM partenaire WHERE Id_user = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setInt(1, Id_user);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 partenaire p = new partenaire(nom, prenom, email, password, dateNaissance, adresse, telephone, dateInscription,
-                        rs.getString("typeService"), rs.getString("siteWeb"), rs.getInt("nbreContrats"));
+                        rs.getString("type_service"), rs.getString("site_web"), rs.getInt("nbre_contacts"));
                 p.setId_user(Id_user); // ✅ Ensure the user ID is explicitly set
                 System.out.println("✅ Assigned user ID in getPartenaire: " + p.getId_user()); // Debugging
                 return p;
@@ -326,6 +331,69 @@ public class authentificationService {
             e.printStackTrace();
             return false;
         }
+    }
+
+
+
+    public void saveImageToDatabase(String imagePath, int userId) {
+        String query = "INSERT INTO faces (user_id, image_path) VALUES (?, ?)";
+
+        try (
+             PreparedStatement pstmt = cnx.prepareStatement(query)) {
+
+            pstmt.setInt(1, userId);
+            pstmt.setString(2, imagePath);
+            pstmt.executeUpdate();
+
+            System.out.println("✅ Image path saved to database successfully!");
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error saving image to database: " + e.getMessage());
+        }
+    }
+
+    public user loginWithFace(int userId) throws Exception {
+        String query = "SELECT * FROM user WHERE Id_user = ?";
+        try (PreparedStatement stmt = cnx.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String email = rs.getString("email");
+                String nom = rs.getString("nom");
+                String prenom = rs.getString("prenom");
+                LocalDate dateNaissance = rs.getDate("date_naiss").toLocalDate();
+                String adresse = rs.getString("adresse");
+                int telephone = rs.getInt("telephone");
+                LocalDate dateInscription = rs.getDate("date_inscription").toLocalDate();
+
+                user userInstance = null;
+                String userType = "";
+
+                if (isOrganisateur(userId)) {
+                    userInstance = getOrganisateur(userId, nom, prenom, email, "", dateNaissance, adresse, telephone, dateInscription);
+                    userType = "organisateur";
+                } else if (isPartenaire(userId)) {
+                    userInstance = getPartenaire(userId, nom, prenom, email, "", dateNaissance, adresse, telephone, dateInscription);
+                    userType = "partenaire";
+                } else if (isParticipant(userId)) {
+                    userInstance = getParticipant(userId, nom, prenom, email, "", dateNaissance, adresse, telephone, dateInscription);
+                    userType = "participant";
+                } else if (isAdmin(userId)) {
+                    userInstance = getAdmin(userId, nom, prenom, email, "", dateNaissance, adresse, telephone, dateInscription);
+                    userType = "admin";
+                }
+
+                if (userInstance != null) {
+                    System.out.println("✅ User Type Identified: " + userType);
+                    String token = generateJwtToken(userInstance, userType); // Generate JWT
+                    userInstance.setJwtToken(token);
+                    System.out.println("✅ Face login successful for user: " + userInstance);
+                    return userInstance;
+                }
+            }
+        }
+        throw new Exception("User not found or face not recognized");
     }
 
 }
