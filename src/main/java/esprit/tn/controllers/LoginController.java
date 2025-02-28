@@ -3,6 +3,8 @@ import esprit.tn.entities.JwtUtils;
 import esprit.tn.entities.SessionManager;
 import esprit.tn.entities.user;
 import esprit.tn.services.authentificationService;
+import esprit.tn.services.BlockingService;
+
 import esprit.tn.services.userService;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
@@ -29,12 +31,16 @@ import java.io.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
 
 public class LoginController {
     private static final String CLIENT_SECRET_FILE = "src/main/resources/client_secret.json";
     private static final List<String> SCOPES = Collections.singletonList("email");
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private final int MAX_ATTEMPTS = 3;
+    private final long LOCKOUT_DURATION = 15 * 60 ; // 15 minutes in milliseconds
+    private int failedAttempts = 0;
+    private long lockoutEndTime = 0;
+    private final BlockingService blockingService = new BlockingService();
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -45,6 +51,9 @@ public class LoginController {
 
     private final authentificationService authService = new authentificationService();
     private final userService users = new userService();
+
+    @FXML private Label timerLabel;
+
     @FXML
     private void handleLogin() {
         String email = usernameField.getText();
@@ -56,35 +65,65 @@ public class LoginController {
             return;
         }
 
-        System.out.println("Attempting login with: " + email + " | " + password);
+        // Check if user is blocked
+        if (blockingService.isUserBlocked(email)) {
+            long blockedUntil = blockingService.getBlockedUntil(email);
+            long remainingTime = (blockedUntil - System.currentTimeMillis()) / 1000; // Convert to seconds
+
+            if (remainingTime > 0) {
+                long minutes = remainingTime / 60;
+                long seconds = remainingTime % 60;
+                messageLabel.setText("⛔ Trop de tentatives. Réessayer dans " + minutes + " min " + seconds + " sec.");
+                messageLabel.setStyle("-fx-text-fill: red;");
+                return;
+            } else {
+                blockingService.resetFailedAttempts(email); // Unblock user if time expired
+            }
+        }
 
         try {
-            user authenticatedUser = authenticate(email, password);
+            user authenticatedUser = authService.login(email, password);
 
             if (authenticatedUser != null && authenticatedUser.getJwtToken() != null) {
-                String token = authenticatedUser.getJwtToken();
-                System.out.println("Generated JWT Token: " + token);
-
-                messageLabel.setText("✅ Login successful!");
+                blockingService.resetFailedAttempts(email); // ✅ Reset failed attempts on success
+                messageLabel.setText("✅ Connexion réussie !");
                 messageLabel.setStyle("-fx-text-fill: green;");
 
-                // Store token in session and local file
+                // Proceed to dashboard
+                String token = authenticatedUser.getJwtToken();
                 SessionManager.setToken(token);
                 saveTokenToFile(token);
-
-                String userType = JwtUtils.extractRole(token);
-                System.out.println("Extracted user role: " + userType);
-                loadDashboard(userType);
+                loadDashboard(JwtUtils.extractRole(token));
             } else {
-                messageLabel.setText("❌ Invalid email or password.");
+                blockingService.incrementFailedAttempts(email); // ❌ Increase failed attempts if login fails
+
+                if (blockingService.getFailedAttempts(email) >= 3) {
+                    long lockoutTime = blockingService.getBlockedUntil(email) - System.currentTimeMillis();
+                    long minutes = lockoutTime / 60000;
+                    long seconds = (lockoutTime / 1000) % 60;
+                    messageLabel.setText("⛔ Trop de tentatives. Réessayer dans " + minutes + " min " + seconds + " sec.");
+                } else {
+                    messageLabel.setText("❌ Email ou mot de passe incorrect.");
+                }
                 messageLabel.setStyle("-fx-text-fill: red;");
+
             }
         } catch (Exception e) {
             e.printStackTrace();
-            messageLabel.setText("❌ Login failed due to an error: " + e.getMessage());
+            messageLabel.setText("❌ Échec de connexion : " + e.getMessage());
             messageLabel.setStyle("-fx-text-fill: red;");
         }
+
     }
+
+
+
+    private static final int MAX_FAILED_ATTEMPTS = 3;
+
+
+
+
+
     private void saveTokenToFile(String token) {
         try (FileWriter writer = new FileWriter("auth_token.txt")) {
             writer.write(token);
