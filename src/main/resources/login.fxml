@@ -29,7 +29,8 @@
             <PasswordField fx:id="passwordField" promptText="Password" style="-fx-pref-height: 40px; -fx-background-radius: 5px;" />
 
             <!-- Login Button (Needs to be disabled if locked) -->
-            <Button fx:id="loginButton" onAction="#handleLogin" style="-fx-background-color: #2575fc; -fx-text-fill: white; -fx-font-size: 14px; -fx-pref-height: 40px; -fx-background-radius: 5px; -fx-font-weight: bold;" text="Login" />
+            <Button fx:id="loginButton" onAction="#handleLogin" disable="false"
+                    style="-fx-background-color: #2575fc; -fx-text-fill: white; -fx-font-size: 14px; -fx-pref-height: 40px; -fx-background-radius: 5px; -fx-font-weight: bold;" text="Login" />
 
             <!-- Error or Status Message -->
             <Label fx:id="messageLabel" style="-fx-font-size: 12px; -fx-text-fill: red;" text="" />
@@ -43,6 +44,7 @@
             </HBox>
 
             <Hyperlink fx:id="forgotpasswordLink" alignment="BOTTOM_CENTER" onAction="#handleforgotpassword" style="-fx-text-fill: #2575fc; -fx-font-weight: bold;" text="Mot de passe oublié ?" textAlignment="CENTER" />
+            <Label fx:id="lockoutMessage" style="-fx-font-size: 12px; -fx-text-fill: red; -fx-font-weight: bold;" text="" visible="false" />
 
             <!-- Face Recognition Login -->
             <Button onAction="#handleFaceLogin" text="Login with Face Recognition" style="-fx-background-color: #00b894; -fx-text-fill: white; -fx-font-size: 14px; -fx-pref-height: 40px; -fx-background-radius: 5px; -fx-font-weight: bold;"/>

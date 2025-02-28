@@ -29,6 +29,14 @@ public class BlockingService {
         return false;
     }
 
+    public long getRemainingLockTime(String email) {
+        if (!isUserBlocked(email)) {
+            return 0;
+        }
+        long blockedUntil = getBlockedUntil(email);
+        long remainingSeconds = (blockedUntil - System.currentTimeMillis()) / 1000;
+        return Math.max(remainingSeconds, 0);
+    }
 
     // ❌ Handle failed login attempt
     public void incrementFailedAttempts(String email) {
@@ -77,14 +85,15 @@ public class BlockingService {
 
     // 🔄 Reset failed attempts
     public void resetFailedAttempts(String email) {
-        String query = "UPDATE user SET failed_attempts = 0, blocked_until = NULL WHERE email = ?";
+        String query = "UPDATE user SET failed_attempts = 0 WHERE email = ?";
+
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setString(1, email);
             int rowsUpdated = stmt.executeUpdate();
             System.out.println("✅ Failed attempts reset for " + email);
             System.out.println("✅ Rows updated: " + rowsUpdated);
         } catch (SQLException e) {
-            System.err.println("⚠️ Error resetting failed attempts: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -103,23 +112,27 @@ public class BlockingService {
     }
 
     // ⏳ Get lockout expiration time
-    public long getBlockedUntil(String email) {
+    public Long getBlockedUntil(String email) {
         String query = "SELECT blocked_until FROM user WHERE email = ?";
+
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                Timestamp blockedUntil = rs.getTimestamp("blocked_until");
-                System.out.println("📌 Retrieved blocked_until: " + blockedUntil);
-                if (blockedUntil != null) {
-                    return blockedUntil.getTime();
+                Timestamp blockedUntilTimestamp = rs.getTimestamp("blocked_until");
+                if (blockedUntilTimestamp != null) {
+                    System.out.println("✅ Retrieved blocked_until: " + blockedUntilTimestamp);
+                    return blockedUntilTimestamp.getTime(); // Convert to milliseconds
+                } else {
+                    System.out.println("⚠️ blocked_until is NULL in the DB!");
+                    return null;
                 }
             }
         } catch (SQLException e) {
-            System.err.println("⚠️ Error getting blocked_until: " + e.getMessage());
+            e.printStackTrace();
         }
-        return 0;
+        return null; // Return null if user not found
     }
 
     public int getFailedAttempts(String email) {

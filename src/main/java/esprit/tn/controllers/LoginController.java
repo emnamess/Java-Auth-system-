@@ -9,6 +9,8 @@ import esprit.tn.services.userService;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,6 +23,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
+import javafx.util.Duration;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -28,9 +31,8 @@ import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 
 import java.io.*;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LoginController {
     private static final String CLIENT_SECRET_FILE = "src/main/resources/client_secret.json";
@@ -47,13 +49,14 @@ public class LoginController {
     @FXML private Label messageLabel;
     @FXML
     private Button logoutButton;
-
-
+    @FXML
+    private Label lockoutMessage;
+    private Timeline countdownTimer;
     private final authentificationService authService = new authentificationService();
     private final userService users = new userService();
+    @FXML private Button loginButton;
 
     @FXML private Label timerLabel;
-
     @FXML
     private void handleLogin() {
         String email = usernameField.getText();
@@ -65,19 +68,20 @@ public class LoginController {
             return;
         }
 
-        // Check if user is blocked
+        // Check if user is already blocked
         if (blockingService.isUserBlocked(email)) {
             long blockedUntil = blockingService.getBlockedUntil(email);
             long remainingTime = (blockedUntil - System.currentTimeMillis()) / 1000; // Convert to seconds
 
             if (remainingTime > 0) {
-                long minutes = remainingTime / 60;
-                long seconds = remainingTime % 60;
-                messageLabel.setText("⛔ Trop de tentatives. Réessayer dans " + minutes + " min " + seconds + " sec.");
+                messageLabel.setText("⛔ Trop de tentatives. Réessayer dans " + (remainingTime / 60) + " min " + (remainingTime % 60) + " sec.");
                 messageLabel.setStyle("-fx-text-fill: red;");
+                loginButton.setDisable(true);
+                startLockoutTimer(remainingTime); // Start countdown
                 return;
             } else {
                 blockingService.resetFailedAttempts(email); // Unblock user if time expired
+                loginButton.setDisable(false); // Re-enable login button
             }
         }
 
@@ -97,33 +101,28 @@ public class LoginController {
             } else {
                 blockingService.incrementFailedAttempts(email); // ❌ Increase failed attempts if login fails
 
-                if (blockingService.getFailedAttempts(email) >= 3) {
-                    long lockoutTime = blockingService.getBlockedUntil(email) - System.currentTimeMillis();
-                    long minutes = lockoutTime / 60000;
-                    long seconds = (lockoutTime / 1000) % 60;
-                    messageLabel.setText("⛔ Trop de tentatives. Réessayer dans " + minutes + " min " + seconds + " sec.");
+                int failedAttempts = blockingService.getFailedAttempts(email);
+                if (failedAttempts >= 3) {
+                    long blockedUntil = blockingService.getBlockedUntil(email);
+                    long remainingTime = (blockedUntil - System.currentTimeMillis()) / 1000; // Convert to seconds
+
+                    messageLabel.setText("⛔ Trop de tentatives. Réessayer dans " + (remainingTime / 60) + " min " + (remainingTime % 60) + " sec.");
+                    messageLabel.setStyle("-fx-text-fill: red;");
+                    loginButton.setDisable(true); // Disable login button
+                    startLockoutTimer(remainingTime); // Start countdown timer
                 } else {
                     messageLabel.setText("❌ Email ou mot de passe incorrect.");
+                    messageLabel.setStyle("-fx-text-fill: red;");
                 }
-                messageLabel.setStyle("-fx-text-fill: red;");
-
             }
         } catch (Exception e) {
             e.printStackTrace();
             messageLabel.setText("❌ Échec de connexion : " + e.getMessage());
             messageLabel.setStyle("-fx-text-fill: red;");
         }
-
     }
 
-
-
     private static final int MAX_FAILED_ATTEMPTS = 3;
-
-
-
-
-
     private void saveTokenToFile(String token) {
         try (FileWriter writer = new FileWriter("auth_token.txt")) {
             writer.write(token);
@@ -133,6 +132,7 @@ public class LoginController {
     }
     @FXML
     private void initialize() {
+
         usernameField.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) { // Wait until scene is attached
                 Platform.runLater(() -> {
@@ -158,6 +158,7 @@ public class LoginController {
             }
         });
     }
+
     private String loadTokenFromFile() {
         File file = new File("auth_token.txt");
         if (!file.exists()) {
@@ -350,6 +351,55 @@ public class LoginController {
         }).start();
     }
 
+
+//    private void startCountdown(long remainingSeconds, String email) {
+//        lockoutMessage.setVisible(true);
+//        loginButton.setDisable(true);
+//
+//        long[] remainingTime = {remainingSeconds}; // Wrap in an array to modify inside lambda
+//
+//        countdownTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+//            if (remainingTime[0] > 0) {
+//                long minutes = remainingTime[0] / 60;
+//                long seconds = remainingTime[0] % 60;
+//                lockoutMessage.setText("🔒 Account locked. Try again in: " + minutes + "m " + seconds + "s");
+//                remainingTime[0]--;
+//            } else {
+//                lockoutMessage.setText("✅ You can now log in.");
+//                loginButton.setDisable(false);
+//                countdownTimer.stop(); // Stop when finished
+//            }
+//        }));
+//
+//        countdownTimer.setCycleCount((int) remainingSeconds);
+//        countdownTimer.play();
+//    }
+private void startLockoutTimer(long remainingSeconds) {
+    loginButton.setDisable(true); // Disable the login button
+
+    Timer timer = new Timer();
+    TimerTask task = new TimerTask() {
+        long remainingTime = remainingSeconds;
+
+        @Override
+        public void run() {
+            Platform.runLater(() -> {
+                if (remainingTime > 0) {
+                    long minutes = remainingTime / 60;
+                    long seconds = remainingTime % 60;
+                    messageLabel.setText("⛔ Trop de tentatives. Réessayer dans " + minutes + " min " + seconds + " sec.");
+                    remainingTime--; // Decrease time
+                } else {
+                    messageLabel.setText(""); // Clear the message
+                    loginButton.setDisable(false); // Re-enable login button
+                    timer.cancel(); // Stop the timer
+                }
+            });
+        }
+    };
+
+    timer.scheduleAtFixedRate(task, 0, 1000); // Run every second
+}
 
 
     private String captureImage() {

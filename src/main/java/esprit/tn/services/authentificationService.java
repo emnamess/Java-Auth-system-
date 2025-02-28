@@ -14,13 +14,11 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +50,19 @@ public class authentificationService {
         return false; // Returns false if no user is found
     }
     public user login(String email, String password) throws Exception {
+        BlockingService blockingService = new BlockingService();
+
+        if (blockingService.isUserBlocked(email)) {
+            long blockedUntil = blockingService.getBlockedUntil(email);
+            long remainingSeconds = (blockedUntil - System.currentTimeMillis()) / 1000;
+            long minutes = remainingSeconds / 60;
+            long seconds = remainingSeconds % 60;
+
+            System.out.println("🛑 User is blocked! Remaining time: " + minutes + " min " + seconds + " sec.");
+            throw new Exception("⛔ Trop de tentatives. Réessayer dans " + minutes + " min " + seconds + " sec.");
+        }
+
+
         String query = "SELECT * FROM user WHERE email = ?";
         try (PreparedStatement stmt = cnx.prepareStatement(query)) {
             stmt.setString(1, email);
@@ -59,12 +70,14 @@ public class authentificationService {
 
             if (rs.next()) {
                 String storedHashedPassword = rs.getString("mot_de_passe");
+
+                // Check if the provided password matches the stored hashed password
                 if (BCrypt.checkpw(password, storedHashedPassword)) {
+                    // Successful login: reset failed attempts and blocking info
+                    blockingService.resetFailedAttempts(email);
+
                     int id = rs.getInt("Id_user");
-
-                    // DEBUG: Print user ID from database
                     System.out.println("🛠 Retrieved userId from DB: " + id);
-
                     if (id == 0) {
                         System.out.println("❌ ERROR: userId is 0, check database!");
                         throw new Exception("Database error: userId is 0");
@@ -89,7 +102,7 @@ public class authentificationService {
                     } else if (isParticipant(id)) {
                         userInstance = getParticipant(id, nom, prenom, email, storedHashedPassword, dateNaissance, adresse, telephone, dateInscription);
                         userType = "participant";
-                    }else if (isAdmin(id)) {
+                    } else if (isAdmin(id)) {
                         userInstance = getAdmin(id, nom, prenom, email, storedHashedPassword, dateNaissance, adresse, telephone, dateInscription);
                         userType = "admin";
                     }
@@ -101,6 +114,10 @@ public class authentificationService {
                         System.out.println("User logged in: " + userInstance);
                         return userInstance;
                     }
+                } else {
+                    // Incorrect password: increment failed attempts
+                    blockingService.incrementFailedAttempts(email);
+                    throw new Exception("Invalid credentials");
                 }
             }
         }
