@@ -412,5 +412,34 @@ public class authentificationService {
         }
         throw new Exception("User not found or face not recognized");
     }
+    public boolean updatePassword1(Integer userId,String newPassword) {
+        // Retrieve userId from token
+        userId = SessionManager.getUserIdFromToken();
+        if (userId == null) {
+            System.out.println("⚠ No valid userId found in token.");
+            return false;
+        }
+
+        System.out.println("[DEBUG] Updating password for userId: " + userId);
+
+        try {
+            // Step 1: Hash the new password
+            String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+
+            // Step 2: Update the password in the database
+            String queryUpdate = "UPDATE user SET mot_de_passe = ? WHERE Id_user = ?";
+            PreparedStatement pstmtUpdate = cnx.prepareStatement(queryUpdate);
+            pstmtUpdate.setString(1, hashedPassword);
+            pstmtUpdate.setInt(2, userId);
+
+            int rowsUpdated = pstmtUpdate.executeUpdate();
+            System.out.println("[DEBUG] Rows updated: " + rowsUpdated);
+
+            return rowsUpdated > 0; // Returns true if at least one row is updated
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

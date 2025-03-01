@@ -12,11 +12,11 @@
     <children>
 
         <VBox alignment="CENTER" layoutX="238.0" prefHeight="739.0" prefWidth="378.0" spacing="10" style="-fx-background-color: white; -fx-padding: 30; -fx-border-radius: 50; -fx-background-radius: 50; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);">
-           <Label fx:id="messageLabel" text="Welcome!" textFill="#3ec765">
-            <font>
-               <Font size="22.0" />
-            </font>
-         </Label>
+            <Label fx:id="messageLabel" text="Welcome!" textFill="#3ec765">
+                <font>
+                    <Font size="22.0" />
+                </font>
+            </Label>
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;" text="Modifier Profil" />
 
             <TextField fx:id="nomField" promptText="Nom" style="-fx-background-radius: 20; -fx-pref-height: 30px;" />
@@ -69,7 +69,8 @@
             <Button fx:id="submitButton" onAction="#handleModifierProfile" style="-fx-background-color: #4facfe; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 10; -fx-padding: 8; -fx-font-weight: bold; -fx-cursor: hand;" text="Modifier" />
 
         </VBox>
-        <Button text="←" onAction="#handleGoBack" />
+        <Label text="←" layoutX="25.0" layoutY="14.0" style="-fx-font-size: 50px; -fx-text-fill: white;"
+               onMouseClicked="#handleGoBack" />
 
     </children>
 </AnchorPane>

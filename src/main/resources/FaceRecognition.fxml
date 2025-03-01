@@ -31,5 +31,6 @@
         <Label fx:id="statusLabel" style="-fx-text-fill: white; -fx-font-size: 14px;"
                text="🔍 Status: Waiting for input..." />
     </VBox>
-
+    <Label text="←" layoutX="25.0" layoutY="14.0" style="-fx-font-size: 50px; -fx-text-fill: white;"
+           onMouseClicked="#handleGoBack" />
 </AnchorPane>

@@ -6,6 +6,8 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.Participant">
    <children>
@@ -14,25 +16,34 @@
             <Font size="72.0" />
          </font>
       </Text>
-      <Button fx:id="logoutButton" layoutX="434.0" layoutY="14.0" mnemonicParsing="false" onAction="#loadLoginScreen" style="-fx-background-color: orange;" text="Se déconnecter">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Button>
-      <ImageView fx:id="NavigationButton" fitHeight="40.0" fitWidth="50.0" layoutX="7.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true" onMouseClicked="#gotomodifyprofile" >
-         <image>
-            <Image url="@images/office-man.png" />
-         </image>
-      </ImageView>
-      <Button fx:id="faceRecognitionButton" layoutX="230.0" layoutY="300.0" mnemonicParsing="false"
-              text="Go to Face Recognition"
-              onAction="#goToFaceRecognition"
-              style="-fx-background-color: #0078D7; -fx-text-fill: white; -fx-font-size: 16px;">
-         <font>
-            <Font size="18.0" />
-         </font>
+
+      <Button fx:id="logoutButton" layoutX="434.0" layoutY="14.0" mnemonicParsing="false"
+              onAction="#loadLoginScreen" style="-fx-background-color: orange; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"
+              text="Se déconnecter">
       </Button>
 
+      <!-- Modern User Menu -->
+      <MenuButton fx:id="userMenu" layoutX="7.0" layoutY="9.0" text=""
+                  style="-fx-background-color: transparent; -fx-font-size: 14px;">
+         <graphic>
+            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/office-man.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <items>
+            <MenuItem text="Modifier Profil" onAction="#gotomodifyprofile"
+                      style="-fx-background-color: white; -fx-text-fill: #333; -fx-padding: 10px;">
+            </MenuItem>
+            <MenuItem text="Modifier Mot de Passe" onAction="#gotomodifypassword"
+                      style="-fx-background-color: white; -fx-text-fill: #333; -fx-padding: 10px;">
+            </MenuItem>
+            <MenuItem text="Go to Face Recognition" onAction="#goToFaceRecognition"
+                      style="-fx-background-color: white; -fx-text-fill: #0078D7; -fx-padding: 10px;">
+            </MenuItem>
+         </items>
+      </MenuButton>
 
    </children>
 </AnchorPane>

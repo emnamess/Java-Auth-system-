@@ -141,11 +141,25 @@ public class ModifierProfil {
 
 
     @FXML
-    private void handleGoBack(ActionEvent event) {
-        SceneController sceneController = new SceneController();
+    private void handleGoBack(MouseEvent event) {
+        System.out.println("Scene stack size before pop: " + NavigationManager.getStackSize());
 
-        sceneController.goBack(event);
+        if (NavigationManager.hasPreviousScene()) {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene previousScene = NavigationManager.popScene();
+
+            if (previousScene != null) {
+                stage.setScene(previousScene);
+                System.out.println("✅ Returned to previous scene.");
+            } else {
+                System.out.println("❌ Previous scene is null.");
+            }
+        } else {
+            System.out.println("❌ No previous scene found.");
+        }
     }
+
+
 
 
 }

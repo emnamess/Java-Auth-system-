@@ -23,5 +23,9 @@ public class NavigationManager {
     public static boolean hasPreviousScene() {
         return !history.isEmpty();
     }
+    public static int getStackSize() {
+        return history.size(); // Assuming sceneStack is a Stack object
+    }
+
 }
 

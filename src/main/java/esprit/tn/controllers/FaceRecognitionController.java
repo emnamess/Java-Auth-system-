@@ -1,19 +1,22 @@
 package esprit.tn.controllers;
 
+import esprit.tn.entities.NavigationManager;
 import esprit.tn.entities.SessionManager;
 import esprit.tn.main.DatabaseConnection;
 import esprit.tn.services.authentificationService;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -103,6 +106,16 @@ public class FaceRecognitionController {
         if (videoCapture.isOpened()) {
             videoCapture.release();
             System.out.println("📷 Camera closed.");
+        }
+    }
+
+    public void handleGoBack(MouseEvent event) {
+        if (NavigationManager.hasPreviousScene()) {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene previousScene = NavigationManager.popScene();
+            stage.setScene(previousScene);
+        } else {
+            System.out.println("No previous scene found.");
         }
     }
 }
