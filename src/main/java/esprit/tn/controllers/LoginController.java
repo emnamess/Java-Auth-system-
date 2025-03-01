@@ -21,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.util.Duration;
@@ -352,7 +353,7 @@ public class LoginController {
     }
 
 
-//    private void startCountdown(long remainingSeconds, String email) {
+    //    private void startCountdown(long remainingSeconds, String email) {
 //        lockoutMessage.setVisible(true);
 //        loginButton.setDisable(true);
 //
@@ -374,32 +375,32 @@ public class LoginController {
 //        countdownTimer.setCycleCount((int) remainingSeconds);
 //        countdownTimer.play();
 //    }
-private void startLockoutTimer(long remainingSeconds) {
-    loginButton.setDisable(true); // Disable the login button
+    private void startLockoutTimer(long remainingSeconds) {
+        loginButton.setDisable(true); // Disable the login button
 
-    Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
-        long remainingTime = remainingSeconds;
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            long remainingTime = remainingSeconds;
 
-        @Override
-        public void run() {
-            Platform.runLater(() -> {
-                if (remainingTime > 0) {
-                    long minutes = remainingTime / 60;
-                    long seconds = remainingTime % 60;
-                    messageLabel.setText("⛔ Trop de tentatives. Réessayer dans " + minutes + " min " + seconds + " sec.");
-                    remainingTime--; // Decrease time
-                } else {
-                    messageLabel.setText(""); // Clear the message
-                    loginButton.setDisable(false); // Re-enable login button
-                    timer.cancel(); // Stop the timer
-                }
-            });
-        }
-    };
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    if (remainingTime > 0) {
+                        long minutes = remainingTime / 60;
+                        long seconds = remainingTime % 60;
+                        messageLabel.setText("⛔ Trop de tentatives. Réessayer dans " + minutes + " min " + seconds + " sec.");
+                        remainingTime--; // Decrease time
+                    } else {
+                        messageLabel.setText(""); // Clear the message
+                        loginButton.setDisable(false); // Re-enable login button
+                        timer.cancel(); // Stop the timer
+                    }
+                });
+            }
+        };
 
-    timer.scheduleAtFixedRate(task, 0, 1000); // Run every second
-}
+        timer.scheduleAtFixedRate(task, 0, 1000); // Run every second
+    }
 
 
     private String captureImage() {
@@ -459,7 +460,21 @@ private void startLockoutTimer(long remainingSeconds) {
     }
 
 
+    public void goBack(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Page_acceuil.fxml"));
+            Parent root = loader.load();
 
+            // Get the current stage
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
+            // Set the new scene
+            stage.setScene(new Scene(root));
+            stage.show();
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
+

@@ -50,5 +50,7 @@
             <Button onAction="#handleFaceLogin" text="Login with Face Recognition" style="-fx-background-color: #00b894; -fx-text-fill: white; -fx-font-size: 14px; -fx-pref-height: 40px; -fx-background-radius: 5px; -fx-font-weight: bold;"/>
 
         </VBox>
+        <Label text="←" layoutX="25.0" layoutY="14.0" style="-fx-font-size: 50px; -fx-text-fill: white;"
+               onMouseClicked="#goBack" />
     </children>
 </AnchorPane>
