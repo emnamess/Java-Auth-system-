@@ -7,6 +7,8 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.layout.StackPane?>
 <AnchorPane prefHeight="497.0" prefWidth="732.0" style="-fx-background-color: linear-gradient(to bottom, #004369, #b1d4e0, #2e4963);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.Participant">
    <children>
 
@@ -14,23 +16,26 @@
       </Button>
 
       <!-- Modern User Menu -->
-      <MenuButton fx:id="userMenu" layoutX="7.0" layoutY="9.0" style="-fx-background-color: transparent; -fx-font-size: 14px;" text="">
+      <MenuButton fx:id="userMenu" layoutX="7.0" layoutY="9.0" text=""
+                  style="-fx-background-color: transparent; -fx-font-size: 14px;">
+
          <graphic>
-            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@images/office-man.png" />
-               </image>
-            </ImageView>
+            <StackPane>
+               <Circle fill="white" radius="22" stroke="lightgray" strokeWidth="1"/>
+               <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                  <Image url="@images/office-man.png"/>
+               </ImageView>
+            </StackPane>
          </graphic>
+
          <items>
-            <MenuItem onAction="#gotomodifyprofile" style="-fx-background-color: white; -fx-text-fill: #333; -fx-padding: 10px;" text="Modifier Profil">
-            </MenuItem>
-            <MenuItem onAction="#gotomodifypassword" style="-fx-background-color: white; -fx-text-fill: #333; -fx-padding: 10px;" text="Modifier Mot de Passe">
-            </MenuItem>
-            <MenuItem onAction="#goToFaceRecognition" style="-fx-background-color: white; -fx-text-fill: #0078D7; -fx-padding: 10px;" text="Go to Face Recognition">
-            </MenuItem>
+            <MenuItem fx:id="modifyProfileItem" onAction="#gotomodifyprofile" text="✏ Modifier Profil" />
+            <MenuItem fx:id="modifyPasswordItem" onAction="#gotomodifypassword" text="🔒 Modifier Mot de Passe" />
+            <MenuItem fx:id="faceRecognitionItem" onAction="#goToFaceRecognition" text="🧑‍💻 Go to Face Recognition" />
          </items>
       </MenuButton>
+
+
 
    </children>
 </AnchorPane>
