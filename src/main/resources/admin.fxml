@@ -17,29 +17,13 @@
     <!-- Top Bar -->
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-width: 0 0 2 0; -fx-border-color: #e0e0e0;">
-            <!-- Notification Icon -->
-            <MenuButton fx:id="notificationButton" text="🔔" contentDisplay="GRAPHIC_ONLY"
-                        style="-fx-background-color: transparent; -fx-font-size: 18px;">
-                <items>
-                    <MenuItem fx:id="menuNoMessages" text="Aucune nouvelle notification"/>
-                </items>
-            </MenuButton>
-
-            <!-- Spacer -->
+            <Label style="-fx-text-fill: #333; -fx-font-size: 14px; -fx-font-weight: bold;" text="🔍 Search:" />
+            <TextField fx:id="searchField" promptText="Faire une recherche" HBox.hgrow="ALWAYS"
+                       style="-fx-padding: 8; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;" />
             <Pane HBox.hgrow="ALWAYS"/>
-
-            <!-- Logout Button -->
             <Button fx:id="logoutButton" onAction="#loadLoginScreen" mnemonicParsing="false" text="Se Déconnecter"
-                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 15;"/>
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 15;"></Button>
         </HBox>
-<!--        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-width: 0 0 2 0; -fx-border-color: #e0e0e0;">-->
-<!--            <Label style="-fx-text-fill: #333; -fx-font-size: 14px; -fx-font-weight: bold;" text="🔍 Search:" />-->
-<!--            <TextField fx:id="searchField" promptText="Faire une recherche" HBox.hgrow="ALWAYS"-->
-<!--                       style="-fx-padding: 8; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;" />-->
-<!--            <Pane HBox.hgrow="ALWAYS"/>-->
-<!--            <Button fx:id="logoutButton" onAction="#loadLoginScreen" mnemonicParsing="false" text="Se Déconnecter"-->
-<!--                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 15;"></Button>-->
-<!--        </HBox>-->
     </top>
 
     <!-- Sidebar -->

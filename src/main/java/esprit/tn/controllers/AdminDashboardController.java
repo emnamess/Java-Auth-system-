@@ -1,11 +1,10 @@
 package esprit.tn.controllers;
 
 import esprit.tn.entities.*;
-import esprit.tn.services.ChatService;
 import esprit.tn.services.userService;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,8 +26,7 @@ public class AdminDashboardController {
     @FXML private MenuItem menuNoMessages;
     @FXML private VBox chatContainer;
     @FXML private Label chatUserLabel;
-    @FXML private TableView<String> chatMessagesTable;
-    @FXML private TextField chatInputField;
+   @FXML private TextField chatInputField;
     @FXML private Button sendChatButton;
     @FXML private Button btnOrganisateurs;
     @FXML private Button btnParticipants;
@@ -43,16 +41,25 @@ public class AdminDashboardController {
     @FXML private TableColumn<user, String> date_inscription;
     @FXML private TableColumn<user, Void> actionColumn; // Delete button column
     @FXML private TextField searchField;
+
     @FXML
     private Button logoutButton;
-    private TableColumn<user, String> extraColumn1;
-    private TableColumn<user, String> extraColumn2;
-    private TableColumn<user, Integer> extraColumn3;
 
+
+
+
+    @FXML private TableColumn<user, String> extraColumn1;
+    @FXML private TableColumn<user, String> extraColumn2;
+    @FXML private TableColumn<user, Integer> extraColumn3;
+    @FXML
+    private HBox topBar;
     private final userService userService = new userService();
     private ObservableList<user> userList = FXCollections.observableArrayList();
-    private final ChatService chatService = new ChatService();
-    private int adminId = 20;
+    private int currentChatUserId;
+    private String currentChatUserName;
+
+
+
     @FXML
     public void initialize() {
         setupTable();
@@ -99,41 +106,8 @@ public class AdminDashboardController {
 
         setupDeleteButtonColumn();
     }
-    private void loadNotifications() {
-        List<Chat> unreadMessages = chatService.getUnreadMessages(adminId);
 
-        notificationButton.getItems().clear();
-        if (unreadMessages.isEmpty()) {
-            notificationButton.getItems().add(menuNoMessages);
-        } else {
-            for (Chat chat : unreadMessages) {
-                MenuItem chatItem = new MenuItem("💬 " + chat.getSenderId());
-                chatItem.setOnAction(e -> openChat(chat.getSenderId(), chat.getSenderId()));
-                notificationButton.getItems().add(chatItem);
-            }
-        }
-    }
-    private void openChat(int userId, String userName) {
-        chatContainer.setVisible(true);
-        chatUserLabel.setText("Chat avec " + userName);
 
-        List<Chat> messages = chatService.getMessages(userId, adminId);
-        chatMessagesTable.getItems().clear();
-        for (Chat msg : messages) {
-            chatMessagesTable.getItems().add(msg.getMessageText());
-        }
-
-        sendChatButton.setOnAction(e -> sendMessage(userId));
-    }
-    private void sendMessage(int receiverId) {
-        String messageText = chatInputField.getText();
-        if (!messageText.isEmpty()) {
-            Chat newMessage = new Chat(adminId, receiverId, messageText);
-            chatService.sendMessage(newMessage);
-            chatInputField.clear();
-            openChat(receiverId, chatUserLabel.getText().replace("Chat avec ", ""));
-        }
-    }
 
     private void setupDeleteButtonColumn() {
         actionColumn.setCellFactory(param -> new TableCell<>() {
@@ -177,15 +151,16 @@ public class AdminDashboardController {
     }
 
     private void loadUsers(Class<? extends user> userType) {
-        List<user> filteredUsers = userService.getall();
+        List<user> allUsers = userService.getall(); // Fetch all users
 
         if (userType != null) {
-            filteredUsers = filteredUsers.stream()
+            // Filter users by type
+            allUsers = allUsers.stream()
                     .filter(userType::isInstance)
                     .collect(Collectors.toList());
         }
 
-        userList.setAll(filteredUsers);
+        userList.setAll(allUsers);
         usersTable.setItems(userList);
     }
 
@@ -225,5 +200,4 @@ public class AdminDashboardController {
             System.out.println("❌ Error loading the login screen.");
         }
     }
-
 }

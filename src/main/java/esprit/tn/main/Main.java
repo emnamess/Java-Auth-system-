@@ -1,39 +1,15 @@
 package esprit.tn.main;
 
-import esprit.tn.entities.*;
 import esprit.tn.services.authentificationService;
 import esprit.tn.services.userService;
-import esprit.tn.services.ChatService;
 
-import org.mindrot.jbcrypt.BCrypt;
-
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
         // Create instances of services
         userService userServiceInstance = new userService();
-        authentificationService authService = new authentificationService();
-        ChatService chatService = new ChatService();
-
-        // Send a message
-        Chat newMessage = new Chat(13, 17, "Hello, how are you?");
-        chatService.sendMessage(newMessage);
-        System.out.println("Message sent!");
-
-        // Retrieve messages
-        List<Chat> chatHistory = chatService.getMessages(13, 17);
-        for (Chat chat : chatHistory) {
-            System.out.println(chat.getSenderId() + " -> " + chat.getReceiverId() + ": " + chat.getMessageText());
-        }
-
-        // Update message status
-        if (!chatHistory.isEmpty()) {
-            chatService.updateMessageStatus(chatHistory.get(0).getId(), "seen");
-            System.out.println("Message status updated to seen.");
-        }
+        authentificationService authService = new authentificationService();}}
 
 //        // Delete a message
 //        if (!chatHistory.isEmpty()) {
@@ -41,9 +17,9 @@ public class Main {
 //            System.out.println("Message deleted.");
 //        }
 
-    }
 
-}
+
+
 
 
 //            List<user> users = userServiceInstance.getByName("emna");

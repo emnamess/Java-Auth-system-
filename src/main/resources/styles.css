@@ -23,3 +23,88 @@
     -fx-scale-x: 0.98;
     -fx-scale-y: 0.98;
 }
+
+
+Button {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+    -fx-font-size: 14px;
+    -fx-padding: 10;
+    -fx-border-radius: 5;
+}
+
+Button:hover {
+    -fx-background-color: #34495E;
+    -fx-cursor: hand;
+}
+.table-view {
+    -fx-background-color: white;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0, 0, 2);
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f9f9f9;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+}
+
+.table-column {
+    -fx-alignment: CENTER-LEFT;
+}
+
+.table-cell {
+    -fx-padding: 8px;
+}
+.text-field {
+    -fx-padding: 8;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #ddd;
+    -fx-background-color: white;
+}
+
+.text-field:focused {
+    -fx-border-color: #3498db;
+    -fx-border-width: 2px;
+    -fx-background-color: #eef7ff;
+}
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-font-size: 18px;
+}
+
+.menu-item {
+    -fx-padding: 10px;
+}
+
+.menu-item:hover {
+    -fx-background-color: #ecf0f1;
+}
+#logoutButton {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 15;
+}
+
+#logoutButton:hover {
+    -fx-background-color: #c0392b;
+    -fx-cursor: hand;
+}
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #bdc3c7;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #95a5a6;
+}
