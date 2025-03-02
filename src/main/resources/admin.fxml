@@ -10,18 +10,36 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.Pane?>
 
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.MenuButton?>
 <BorderPane prefHeight="650.0" prefWidth="855.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="esprit.tn.controllers.AdminDashboardController">
 
     <!-- Top Bar -->
     <top>
         <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-width: 0 0 2 0; -fx-border-color: #e0e0e0;">
-            <Label style="-fx-text-fill: #333; -fx-font-size: 14px; -fx-font-weight: bold;" text="🔍 Search:" />
-            <TextField fx:id="searchField" promptText="Faire une recherche" HBox.hgrow="ALWAYS"
-                       style="-fx-padding: 8; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;" />
+            <!-- Notification Icon -->
+            <MenuButton fx:id="notificationButton" text="🔔" contentDisplay="GRAPHIC_ONLY"
+                        style="-fx-background-color: transparent; -fx-font-size: 18px;">
+                <items>
+                    <MenuItem fx:id="menuNoMessages" text="Aucune nouvelle notification"/>
+                </items>
+            </MenuButton>
+
+            <!-- Spacer -->
             <Pane HBox.hgrow="ALWAYS"/>
+
+            <!-- Logout Button -->
             <Button fx:id="logoutButton" onAction="#loadLoginScreen" mnemonicParsing="false" text="Se Déconnecter"
-                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 15;"></Button>
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 15;"/>
         </HBox>
+<!--        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-border-width: 0 0 2 0; -fx-border-color: #e0e0e0;">-->
+<!--            <Label style="-fx-text-fill: #333; -fx-font-size: 14px; -fx-font-weight: bold;" text="🔍 Search:" />-->
+<!--            <TextField fx:id="searchField" promptText="Faire une recherche" HBox.hgrow="ALWAYS"-->
+<!--                       style="-fx-padding: 8; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #ddd;" />-->
+<!--            <Pane HBox.hgrow="ALWAYS"/>-->
+<!--            <Button fx:id="logoutButton" onAction="#loadLoginScreen" mnemonicParsing="false" text="Se Déconnecter"-->
+<!--                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 15;"></Button>-->
+<!--        </HBox>-->
     </top>
 
     <!-- Sidebar -->
@@ -54,5 +72,17 @@
             </TableView>
         </VBox>
     </center>
-
+    <VBox fx:id="chatContainer" spacing="5" style="-fx-padding: 10; -fx-background-color: white; -fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0, 0, 2);"
+          BorderPane.alignment="BOTTOM_CENTER" visible="false">
+        <Label fx:id="chatUserLabel" text="Chat avec ..." style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+        <TableView fx:id="chatMessagesTable">
+            <columns>
+                <TableColumn text="Message"/>
+            </columns>
+        </TableView>
+        <HBox spacing="5">
+            <TextField fx:id="chatInputField" promptText="Écrire un message..." HBox.hgrow="ALWAYS"/>
+            <Button fx:id="sendChatButton" text="Envoyer"/>
+        </HBox>
+    </VBox>
 </BorderPane>

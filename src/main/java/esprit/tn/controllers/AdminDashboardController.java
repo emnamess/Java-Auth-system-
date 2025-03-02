@@ -1,6 +1,7 @@
 package esprit.tn.controllers;
 
 import esprit.tn.entities.*;
+import esprit.tn.services.ChatService;
 import esprit.tn.services.userService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -21,7 +23,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class AdminDashboardController {
-
+    @FXML private MenuButton notificationButton;
+    @FXML private MenuItem menuNoMessages;
+    @FXML private VBox chatContainer;
+    @FXML private Label chatUserLabel;
+    @FXML private TableView<String> chatMessagesTable;
+    @FXML private TextField chatInputField;
+    @FXML private Button sendChatButton;
     @FXML private Button btnOrganisateurs;
     @FXML private Button btnParticipants;
     @FXML private Button btnPartenaires;
@@ -43,7 +51,8 @@ public class AdminDashboardController {
 
     private final userService userService = new userService();
     private ObservableList<user> userList = FXCollections.observableArrayList();
-
+    private final ChatService chatService = new ChatService();
+    private int adminId = 20;
     @FXML
     public void initialize() {
         setupTable();
@@ -89,6 +98,41 @@ public class AdminDashboardController {
         date_inscription.setCellValueFactory(new PropertyValueFactory<>("dateInscription"));
 
         setupDeleteButtonColumn();
+    }
+    private void loadNotifications() {
+        List<Chat> unreadMessages = chatService.getUnreadMessages(adminId);
+
+        notificationButton.getItems().clear();
+        if (unreadMessages.isEmpty()) {
+            notificationButton.getItems().add(menuNoMessages);
+        } else {
+            for (Chat chat : unreadMessages) {
+                MenuItem chatItem = new MenuItem("💬 " + chat.getSenderId());
+                chatItem.setOnAction(e -> openChat(chat.getSenderId(), chat.getSenderId()));
+                notificationButton.getItems().add(chatItem);
+            }
+        }
+    }
+    private void openChat(int userId, String userName) {
+        chatContainer.setVisible(true);
+        chatUserLabel.setText("Chat avec " + userName);
+
+        List<Chat> messages = chatService.getMessages(userId, adminId);
+        chatMessagesTable.getItems().clear();
+        for (Chat msg : messages) {
+            chatMessagesTable.getItems().add(msg.getMessageText());
+        }
+
+        sendChatButton.setOnAction(e -> sendMessage(userId));
+    }
+    private void sendMessage(int receiverId) {
+        String messageText = chatInputField.getText();
+        if (!messageText.isEmpty()) {
+            Chat newMessage = new Chat(adminId, receiverId, messageText);
+            chatService.sendMessage(newMessage);
+            chatInputField.clear();
+            openChat(receiverId, chatUserLabel.getText().replace("Chat avec ", ""));
+        }
     }
 
     private void setupDeleteButtonColumn() {
