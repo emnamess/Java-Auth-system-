@@ -1,47 +1,57 @@
 package esprit.tn.main;
 
-import esprit.tn.services.authentificationService;
-import esprit.tn.services.userService;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import esprit.tn.entities.SessionManager;
 
-import java.util.List;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
-        // Create instances of services
-        userService userServiceInstance = new userService();
-        authentificationService authService = new authentificationService();}}
+        // 🔹 Generate a token with a short expiration (e.g., 10 seconds)
+        String validToken = JWT.create()
+                .withClaim("userId", 123)
+                .withExpiresAt(new Date(System.currentTimeMillis() + 10000)) // Expires in 10 sec
+                .sign(Algorithm.HMAC256("secret"));
 
-//        // Delete a message
-//        if (!chatHistory.isEmpty()) {
-//            chatService.deleteMessage(chatHistory.get(0).getId());
-//            System.out.println("Message deleted.");
-//        }
+        System.out.println("🟢 Generated Token: " + validToken);
 
+        // 🔹 Save token in SessionManager
+        SessionManager.setToken(validToken);
 
+        // 🔍 Check token expiration every second
+        while (true) {
+            try {
+                TimeUnit.SECONDS.sleep(1); // Wait 1 second
+                long remainingTime = getRemainingTime(SessionManager.getToken());
 
+                if (remainingTime > 0) {
+                    System.out.println("⏳ Token expires in " + remainingTime + " seconds...");
+                } else {
+                    System.out.println("❌ Token has expired!");
+                    break; // Exit loop when expired
+                }
 
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
+    // ✅ Helper method to check remaining time
+    public static long getRemainingTime(String token) {
+        if (token == null) return 0;
 
-//            List<user> users = userServiceInstance.getByName("emna");
-//
-//            if (!users.isEmpty()) {
-//                System.out.println("✅ Users found:");
-//                for (user u : users) {
-//                    System.out.println(u);
-//                }
-//            } else {
-//                System.out.println("❌ No users found with the given name.");
-//            }
+        try {
+            DecodedJWT decodedJWT = JWT.decode(token);
+            long expiration = decodedJWT.getExpiresAt().getTime();
+            long currentTime = System.currentTimeMillis();
 
-        // Uncomment to test password hashing
-        // String plainPassword = "TopAdmin123";
-        // String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
-        // System.out.println("Hashed Password: " + hashedPassword);
-
-        // Uncomment to test password update
-        // String userEmail = "Emna.MESSAOUDI@esprit.tn";
-        // String newPassword = "NewSecurePass@123";
-        // boolean isUpdated = authService.updatePassword(userEmail, newPassword);
-        // System.out.println(isUpdated ? "✅ Password updated successfully" : "❌ Failed to update password.");
-
-
+            return (expiration - currentTime) / 1000; // Convert to seconds
+        } catch (Exception e) {
+            return 0; // Assume expired if error occurs
+        }
+    }
+}

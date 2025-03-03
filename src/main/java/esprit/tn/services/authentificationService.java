@@ -124,7 +124,7 @@ public class authentificationService {
         throw new Exception("Invalid credentials");
     }
 
-    private String generateJwtToken(user authenticatedUser, String role) {
+    public String generateJwtToken(user authenticatedUser, String role) {
         System.out.println("🛠 Generating token for user ID: " + authenticatedUser.getId_user());
 
         if (authenticatedUser.getId_user() == 0) {
@@ -136,12 +136,12 @@ public class authentificationService {
                 .withClaim("email", authenticatedUser.getEmail())
                 .withClaim("role", role)
                 .withIssuedAt(Date.from(Instant.now()))
-                .withExpiresAt(Date.from(Instant.now().plusSeconds(3600)))
+                .withExpiresAt(Date.from(Instant.now().plusSeconds(10)))
                 .sign(Algorithm.HMAC256(SECRET_KEY));
     }
 
 
-    private String getRoleFromInstance(user authenticatedUser) {
+    public String getRoleFromInstance(user authenticatedUser) {
         if (authenticatedUser instanceof organisateur) {
             return "organisateur";
         } else if (authenticatedUser instanceof partenaire) {

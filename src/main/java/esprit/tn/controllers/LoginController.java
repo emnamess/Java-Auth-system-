@@ -1,6 +1,7 @@
 package esprit.tn.controllers;
 import esprit.tn.entities.JwtUtils;
 import esprit.tn.entities.SessionManager;
+import esprit.tn.entities.SessionTimer;
 import esprit.tn.entities.user;
 import esprit.tn.services.authentificationService;
 import esprit.tn.services.BlockingService;
@@ -94,13 +95,21 @@ public class LoginController {
                 messageLabel.setText("✅ Connexion réussie !");
                 messageLabel.setStyle("-fx-text-fill: green;");
 
-                // Proceed to dashboard
+                // 🛠 Store token & start session tracking
                 String token = authenticatedUser.getJwtToken();
                 SessionManager.setToken(token);
                 saveTokenToFile(token);
+
+                // 🕒 Start session timer to track expiration
+                SessionTimer.startSessionChecker();
+                System.out.println("🕒 Session Timer started after login.");
+
+                // 🚀 Proceed to dashboard
                 loadDashboard(JwtUtils.extractRole(token));
+
             } else {
-                blockingService.incrementFailedAttempts(email); // ❌ Increase failed attempts if login fails
+                // ❌ Failed login: increase failed attempts
+                blockingService.incrementFailedAttempts(email);
 
                 int failedAttempts = blockingService.getFailedAttempts(email);
                 if (failedAttempts >= 3) {
@@ -109,8 +118,8 @@ public class LoginController {
 
                     messageLabel.setText("⛔ Trop de tentatives. Réessayer dans " + (remainingTime / 60) + " min " + (remainingTime % 60) + " sec.");
                     messageLabel.setStyle("-fx-text-fill: red;");
-                    loginButton.setDisable(true); // Disable login button
-                    startLockoutTimer(remainingTime); // Start countdown timer
+                    loginButton.setDisable(true);
+                    startLockoutTimer(remainingTime);
                 } else {
                     messageLabel.setText("❌ Email ou mot de passe incorrect.");
                     messageLabel.setStyle("-fx-text-fill: red;");
@@ -122,6 +131,7 @@ public class LoginController {
             messageLabel.setStyle("-fx-text-fill: red;");
         }
     }
+
 
     private static final int MAX_FAILED_ATTEMPTS = 3;
     private void saveTokenToFile(String token) {
