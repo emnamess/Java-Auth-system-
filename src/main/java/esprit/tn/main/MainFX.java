@@ -37,7 +37,7 @@ public class MainFX extends Application {
     }
 
     private String loadTokenFromFile() {
-        File file = new File("auth_token.txt");
+        File file = new File("token.txt");
         if (!file.exists()) {
             return null;
         }
