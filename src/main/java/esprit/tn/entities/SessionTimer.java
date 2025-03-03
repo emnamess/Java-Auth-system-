@@ -2,9 +2,17 @@ package esprit.tn.entities;
 
 import esprit.tn.services.authentificationService;
 import esprit.tn.services.userService;
+import io.jsonwebtoken.io.IOException;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,32 +25,28 @@ public class SessionTimer {
 
     public static void startSessionChecker() {
         if (sessionTimer != null) {
-            sessionTimer.cancel(); // Cancel previous timer if running
+            sessionTimer.cancel();
         }
+        System.out.println("🕒 Session checker started...");
 
         sessionTimer = new Timer(true);
         sessionTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 long remainingTime = SessionManager.getRemainingSessionTime();
-                System.out.println("⏳ Checking session... Remaining: " + remainingTime + " seconds");
-
-                if (remainingTime <= 0) {
-                    System.out.println("❌ Session expired! Logging out.");
-                    Platform.runLater(SessionTimer::logoutUser);
-                    return;
-                }
+                System.out.println("⏳ Checking session time... Remaining: " + remainingTime + " seconds");
 
                 if (remainingTime > 0 && remainingTime <= 60 && !warningShown) {
                     warningShown = true;
+                    System.out.println("🚨 Triggering session expiry warning...");
                     showSessionExpiryWarning();
                 }
             }
-        }, 0, 30000); // Every 30 sec
+        }, 0, 30000); // Check every 30 seconds
     }
 
     private static void showSessionExpiryWarning() {
-        Platform.runLater(() -> { // Run UI updates on JavaFX thread
+        Platform.runLater(() -> {
             System.out.println("🚨 Showing session expiry warning...");
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -54,12 +58,11 @@ public class SessionTimer {
             ButtonType logoutButton = new ButtonType("Logout");
 
             alert.getButtonTypes().setAll(extendButton, logoutButton);
-
             alert.showAndWait().ifPresent(response -> {
                 if (response == extendButton) {
-                    extendSession(); // Extend session
+                    extendSession();
                 } else {
-                    logoutUser(); // Logout user
+                    logoutUser();
                 }
             });
         });
@@ -97,9 +100,56 @@ public class SessionTimer {
         startSessionChecker(); // Restart session timer
     }
 
-    private static void logoutUser() {
-        System.out.println("🚪 Logging out user...");
-        SessionManager.clearToken();
-        Platform.exit(); // Close the application
+    private static void logoutUser() {  // For calls without an event
+        logoutUser(null);
     }
+
+    private static void logoutUser(ActionEvent event) {  // For button clicks
+        System.out.println("⚠ LOGOUT TRIGGERED! Checking why...");
+        System.out.println("Token: " + SessionManager.getToken());
+        System.out.println("Remaining Time: " + SessionManager.getRemainingSessionTime());
+
+        SessionManager.clearToken();
+        if (SessionTimer.sessionTimer != null) {
+            SessionTimer.sessionTimer.cancel();
+        }
+
+        // Clear token
+        SessionManager.clearToken();
+
+        // Stop session timer
+        if (SessionTimer.sessionTimer != null) {
+            SessionTimer.sessionTimer.cancel();
+            System.out.println("🛑 Session timer stopped.");
+        }
+
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(SessionTimer.class.getResource("/Login.fxml"));
+                Parent root = loader.load();
+
+                Stage stage;
+                if (event != null) {
+                    stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                } else {
+                    // Fallback: Get the current window manually
+                    stage = (Stage) Window.getWindows().stream()
+                            .filter(Window::isShowing)
+                            .findFirst()
+                            .orElse(null);
+                }
+
+                if (stage != null) {
+                    stage.setScene(new Scene(root));
+                    stage.show();
+                }
+            } catch (IOException | java.io.IOException e) {
+                System.out.println("❌ Error loading Login screen: " + e.getMessage());
+                e.printStackTrace(); // Print the full stack trace for debugging
+            }
+        });
+
+    }
+
+
 }

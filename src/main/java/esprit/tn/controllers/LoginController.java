@@ -135,7 +135,7 @@ public class LoginController {
 
     private static final int MAX_FAILED_ATTEMPTS = 3;
     private void saveTokenToFile(String token) {
-        try (FileWriter writer = new FileWriter("auth_token.txt")) {
+        try (FileWriter writer = new FileWriter("token.txt")) {
             writer.write(token);
         } catch (IOException e) {
             e.printStackTrace();
@@ -171,7 +171,7 @@ public class LoginController {
     }
 
     private String loadTokenFromFile() {
-        File file = new File("auth_token.txt");
+        File file = new File("token.txt");
         if (!file.exists()) {
             return null;
         }

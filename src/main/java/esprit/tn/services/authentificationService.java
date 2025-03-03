@@ -136,7 +136,7 @@ public class authentificationService {
                 .withClaim("email", authenticatedUser.getEmail())
                 .withClaim("role", role)
                 .withIssuedAt(Date.from(Instant.now()))
-                .withExpiresAt(Date.from(Instant.now().plusSeconds(10)))
+                .withExpiresAt(Date.from(Instant.now().plusSeconds(70)))
                 .sign(Algorithm.HMAC256(SECRET_KEY));
     }
 

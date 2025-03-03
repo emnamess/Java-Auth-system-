@@ -116,10 +116,11 @@ public class SessionManager {
             Instant now = Instant.now();
 
             long remainingTime = expirationTime.getEpochSecond() - now.getEpochSecond();
-            System.out.println("⏳ Session Time Left: " + remainingTime + " seconds");
+            System.out.println("⏳ Time left until session expires: " + remainingTime + " seconds");
             return remainingTime;
         } catch (Exception e) {
-            return 0; // If there's an error, assume expired
+            System.out.println("❌ Error calculating remaining time: " + e.getMessage());
+            return 0;
         }
     }
 
