@@ -439,7 +439,7 @@ public class LoginController {
 
     private String sendImageToRecognition(String imagePath) {
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("python", "C:\\Python\\face_recognition_api.py", imagePath);
+            ProcessBuilder processBuilder = new ProcessBuilder("python", "\\face_recognition_api.py", imagePath);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
